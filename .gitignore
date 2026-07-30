@@ -1,1 +1,11 @@
 .worktrees/
+
+# Python caches
+__pycache__/
+.pytest_cache/
+
+# Reverse-engineering artifacts
+artifacts/
+*.apk
+*.aab
+*.ipa
