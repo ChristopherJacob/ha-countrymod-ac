@@ -41,8 +41,14 @@ reported for it. `menu gatt` was available, but
 target service, characteristic, or descriptor path was discovered, and no
 target handle or property is available in the host output.
 
+This error is not attributed to a specific cause by this census. A later
+read-only retry should first confirm the target is physically powered and in
+range, take a fresh pre-connect scan and info snapshot, verify
+`ServicesResolved` before enumerating GATT, and finish with an explicit
+disconnect.
+
 An earlier no-delay command sequence did print GATT objects below a different
-cached device path (`.../dev_6C_79_B8_B4_4F_C0/...`) before a target connection
+cached device path (`.../dev_REDACTED/...`) before a target connection
 had been confirmed. Those objects are excluded from this census.
 
 ## Discovered attributes
