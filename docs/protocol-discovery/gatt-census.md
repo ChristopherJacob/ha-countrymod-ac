@@ -1,8 +1,8 @@
 # ContryMod GATT census
 
-Captured from the RV host on 2026-07-30 (UTC). The raw controller transcript is
-stored locally in the ignored `artifacts/ble-captures/` directory; it is not part
-of this commit.
+Captured from the RV host on 2026-07-30 (UTC), including a later successful
+read-only retry. Raw controller transcripts are stored locally in the ignored
+`artifacts/ble-captures/` directory; they are not part of this commit.
 
 ## Read-only boundary
 
@@ -17,66 +17,77 @@ operation was performed. The connection did not remain established.
 | --- | --- |
 | Device address | `CA:04:59:8E:**:**` (redacted after the first four octets) |
 | Address type | `public` |
-| Advertised name | `KT2026020005224` in the final controller info query. The first required pre-connect query instead showed `LS Dis Server`; the host later refreshed the same device record to `KT2026020005224`. |
-| RSSI | `-64 dBm` in the first pre-connect query; `-65 dBm` after the attempt (the live session also reported target updates between `-62` and `-80 dBm`). |
+| Advertised name | The controller record showed `KT2026020005224` in the fresh retry pre-connect snapshot, then `LS Dis Server` while connected and in the post-disconnect snapshot. |
+| RSSI | `-64 dBm` in the fresh retry pre-connect snapshot and `-79 dBm` in the post-disconnect snapshot. |
 | Advertising flags | `06` |
 | First pre-connect state | `Paired: no`, `Bonded: no`, `Trusted: no`, `Blocked: no`, `Connected: no`; LE paired, bonded, and connected were also `no`. |
-| Final state | `Connected: no`; the explicit `disconnect` reported success. |
+| Final state | `Connected: no` in the post-disconnect verification. |
 
-The first pre-connect query listed `0000ffe0-0000-1000-8000-00805f9b34fb`
-as an unknown device UUID. This is advertisement/controller metadata, not a
-resolved GATT service object.
+The post-disconnect controller record listed
+`0000ffe0-0000-1000-8000-00805f9b34fb` as an unknown device UUID. This is
+advertisement/controller metadata, distinct from the resolved GATT service
+below.
 
 ## Connection and enumeration result
 
-`bluetoothctl` reported a brief target `Connected: yes` transition, then:
+An earlier connection attempt ended with:
 
 ```
 Failed to connect: org.bluez.Error.Failed le-connection-abort-by-local
 ```
 
-The target returned to `Connected: no`; no `ServicesResolved: yes` event was
-reported for it. `menu gatt` was available, but
-`list-attributes CA:04:59:8E:**:**` emitted no target attributes. Therefore no
-target service, characteristic, or descriptor path was discovered, and no
-target handle or property is available in the host output.
+This failure is not attributed to a specific cause by this census. A later
+read-only retry first confirmed the target in the controller record, then
+reported `Connection successful` and `ServicesResolved: yes`. `menu gatt` and
+`list-attributes` returned the target objects below. An explicit `disconnect`
+was issued, and the subsequent `bluetoothctl info` verification reported
+`Connected: no`.
 
-This error is not attributed to a specific cause by this census. A later
-read-only retry should first confirm the target is physically powered and in
-range, take a fresh pre-connect scan and info snapshot, verify
-`ServicesResolved` before enumerating GATT, and finish with an explicit
-disconnect.
-
-An earlier no-delay command sequence did print GATT objects below a different
-cached device path (`.../dev_REDACTED/...`) before a target connection
-had been confirmed. Those objects are excluded from this census.
+All object paths below preserve the RV host path and redact the final two
+device-address octets as `dev_CA_04_59_8E_REDACTED`.
 
 ## Discovered attributes
 
-None for the target. Because service resolution failed, there are no observed
-target paths, handles, UUID-bearing GATT objects, properties, or descriptors to
-record. “Unavailable” below means unavailable in the RV host output, not an
-assertion that the peripheral lacks the item.
+`list-attributes` did not emit object properties/flags. “Unavailable” in the
+properties column therefore means unavailable in the RV host output, not an
+assertion about the peripheral. No value read, characteristic write, or
+notification operation was used to obtain the census.
+
+| Type | Handle | Path (device segment redacted) | UUID | Host label / descriptor relation | Properties |
+| --- | --- | --- | --- | --- | --- |
+| Primary service | `0x0001` | `/org/bluez/hci0/dev_CA_04_59_8E_REDACTED/service0001` | `00001800-0000-1000-8000-00805f9b34fb` | Generic Access Profile | Unavailable in `list-attributes` output |
+| Characteristic | `0x0002` | `/org/bluez/hci0/dev_CA_04_59_8E_REDACTED/service0001/char0002` | `00002a00-0000-1000-8000-00805f9b34fb` | Device Name | Unavailable in `list-attributes` output |
+| Characteristic | `0x0004` | `/org/bluez/hci0/dev_CA_04_59_8E_REDACTED/service0001/char0004` | `00002a01-0000-1000-8000-00805f9b34fb` | Appearance | Unavailable in `list-attributes` output |
+| Primary service | `0x0006` | `/org/bluez/hci0/dev_CA_04_59_8E_REDACTED/service0006` | `00001801-0000-1000-8000-00805f9b34fb` | Generic Attribute Profile | Unavailable in `list-attributes` output |
+| Characteristic | `0x0007` | `/org/bluez/hci0/dev_CA_04_59_8E_REDACTED/service0006/char0007` | `00002a05-0000-1000-8000-00805f9b34fb` | Service Changed | Unavailable in `list-attributes` output |
+| Descriptor | `0x0009` | `/org/bluez/hci0/dev_CA_04_59_8E_REDACTED/service0006/char0007/desc0009` | `00002902-0000-1000-8000-00805f9b34fb` | Client Characteristic Configuration for `0x0007` | Unavailable in `list-attributes` output |
+| Characteristic | `0x000a` | `/org/bluez/hci0/dev_CA_04_59_8E_REDACTED/service0006/char000a` | `00002b29-0000-1000-8000-00805f9b34fb` | Client Supported Features | Unavailable in `list-attributes` output |
+| Characteristic | `0x000c` | `/org/bluez/hci0/dev_CA_04_59_8E_REDACTED/service0006/char000c` | `00002b2a-0000-1000-8000-00805f9b34fb` | Database Hash | Unavailable in `list-attributes` output |
+| Primary service | `0x000e` | `/org/bluez/hci0/dev_CA_04_59_8E_REDACTED/service000e` | `0000ffe0-0000-1000-8000-00805f9b34fb` | Unknown | Unavailable in `list-attributes` output |
+| Characteristic | `0x000f` | `/org/bluez/hci0/dev_CA_04_59_8E_REDACTED/service000e/char000f` | `0000ffe2-0000-1000-8000-00805f9b34fb` | Unknown | Unavailable in `list-attributes` output |
+| Characteristic | `0x0011` | `/org/bluez/hci0/dev_CA_04_59_8E_REDACTED/service000e/char0011` | `0000ffe1-0000-1000-8000-00805f9b34fb` | Unknown | Unavailable in `list-attributes` output |
+| Descriptor | `0x0013` | `/org/bluez/hci0/dev_CA_04_59_8E_REDACTED/service000e/char0011/desc0013` | `00002902-0000-1000-8000-00805f9b34fb` | Client Characteristic Configuration for `0x0011` | Unavailable in `list-attributes` output |
 
 ## Static-analysis cross-check
 
 | Static expectation | Expected UUID / role | Status in captured target output | Observed handle | Observed properties |
 | --- | --- | --- | --- | --- |
-| Custom service | `FFE0` / service | **Present** as an unknown pre-connect device UUID; not GATT-resolved | Unavailable in host output | Unavailable in host output |
-| Notification characteristic | `FFE1` / notification | **Absent from the captured target output**; enumeration failed, so this is not evidence of peripheral absence | Unavailable in host output | Unavailable in host output |
-| Command characteristic | `FFE2` / static write role | **Absent from the captured target output**; enumeration failed, so this is not evidence of peripheral absence | Unavailable in host output | Unavailable in host output |
+| Custom service | `FFE0` / service | **Present** | `0x000e` | Unavailable in `list-attributes` output |
+| Notification characteristic | `FFE1` / notification | **Present**; CCCD descriptor at `0x0013` | `0x0011` | Unavailable in `list-attributes` output |
+| Command characteristic | `FFE2` / static write role | **Present** | `0x000f` | Unavailable in `list-attributes` output |
 
-There is no observed UUID mismatch: the only expected UUID present in the target
-record was `FFE0`. `FFE1` and `FFE2` could not be checked against a resolved
-GATT database because the connection was aborted before services resolved.
+There is no observed UUID mismatch: the successful resolved database contains
+all three static expectations at the handles above. The controller did not emit
+properties, so the static notification/write role expectations are not verified
+as observed properties by this census.
 
 ## Commands used
 
-- `bluetoothctl info <redacted target>` before the connection attempt
+- `bluetoothctl info <redacted target>` before the retry connection attempt
 - Interactive `bluetoothctl`: `connect <redacted target>`, `menu gatt`,
   `list-attributes <redacted target>`, `back`, `disconnect <redacted target>`,
   `quit`
-- `bluetoothctl info <redacted target>` after disconnection
+- `bluetoothctl info <redacted target>` after disconnection to verify final state
 
 No GATT read, characteristic write, notification subscription, pairing,
 trust-setting, removal, or controller configuration command was issued.
