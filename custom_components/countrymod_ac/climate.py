@@ -1,4 +1,4 @@
-"""Climate platform for the ContryMod RV air conditioner."""
+"""Climate platform for the CountryMod RV air conditioner."""
 
 from __future__ import annotations
 
@@ -14,9 +14,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import ContryModConfigEntry
+from . import CountryModConfigEntry
 from .const import DOMAIN
-from .entity import ContryModEntity
+from .entity import CountryModEntity
 from .protocol import (
     MAX_FAN_SPEED,
     MAX_TEMP_C,
@@ -73,14 +73,14 @@ PRESET_TO_COMMAND: dict[str, ModeCommand] = {
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ContryModConfigEntry,
+    entry: CountryModConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the climate entity."""
-    async_add_entities([ContryModClimate(entry.runtime_data)])
+    async_add_entities([CountryModClimate(entry.runtime_data)])
 
 
-class ContryModClimate(ContryModEntity, ClimateEntity):
+class CountryModClimate(CountryModEntity, ClimateEntity):
     """The air conditioner itself."""
 
     _attr_name = None

@@ -1,4 +1,4 @@
-"""Sensor platform for the ContryMod RV air conditioner."""
+"""Sensor platform for the CountryMod RV air conditioner."""
 
 from __future__ import annotations
 
@@ -20,20 +20,20 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import ContryModConfigEntry
-from .entity import ContryModEntity
-from .protocol import ContryModState
+from . import CountryModConfigEntry
+from .entity import CountryModEntity
+from .protocol import CountryModState
 
 
 @dataclass(frozen=True, kw_only=True)
-class ContryModSensorDescription(SensorEntityDescription):
-    """Describes a ContryMod sensor."""
+class CountryModSensorDescription(SensorEntityDescription):
+    """Describes a CountryMod sensor."""
 
-    value_fn: Callable[[ContryModState], float | int | None]
+    value_fn: Callable[[CountryModState], float | int | None]
 
 
-SENSORS: tuple[ContryModSensorDescription, ...] = (
-    ContryModSensorDescription(
+SENSORS: tuple[CountryModSensorDescription, ...] = (
+    CountryModSensorDescription(
         key="inlet_temperature",
         translation_key="inlet_temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -42,7 +42,7 @@ SENSORS: tuple[ContryModSensorDescription, ...] = (
     ),
     # The coil reading is reported in a different unit from the rest of the
     # frame. Celsius is inferred from its observed range, not confirmed.
-    ContryModSensorDescription(
+    CountryModSensorDescription(
         key="core_temperature",
         translation_key="core_temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -51,7 +51,7 @@ SENSORS: tuple[ContryModSensorDescription, ...] = (
         entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda state: state.core_temperature,
     ),
-    ContryModSensorDescription(
+    CountryModSensorDescription(
         key="voltage",
         translation_key="voltage",
         device_class=SensorDeviceClass.VOLTAGE,
@@ -59,7 +59,7 @@ SENSORS: tuple[ContryModSensorDescription, ...] = (
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         value_fn=lambda state: state.voltage,
     ),
-    ContryModSensorDescription(
+    CountryModSensorDescription(
         key="fault_code",
         translation_key="fault_code",
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -67,7 +67,7 @@ SENSORS: tuple[ContryModSensorDescription, ...] = (
     ),
     # The app names these currents but their scaling was never confirmed --
     # both read zero in every capture -- so they are exposed unitless.
-    ContryModSensorDescription(
+    CountryModSensorDescription(
         key="compressor_current",
         translation_key="compressor_current",
         state_class=SensorStateClass.MEASUREMENT,
@@ -75,7 +75,7 @@ SENSORS: tuple[ContryModSensorDescription, ...] = (
         entity_registry_enabled_default=False,
         value_fn=lambda state: state.compressor_current,
     ),
-    ContryModSensorDescription(
+    CountryModSensorDescription(
         key="fan_current",
         translation_key="fan_current",
         state_class=SensorStateClass.MEASUREMENT,
@@ -83,7 +83,7 @@ SENSORS: tuple[ContryModSensorDescription, ...] = (
         entity_registry_enabled_default=False,
         value_fn=lambda state: state.fan_current,
     ),
-    ContryModSensorDescription(
+    CountryModSensorDescription(
         key="remaining_open_time",
         translation_key="remaining_open_time",
         device_class=SensorDeviceClass.DURATION,
@@ -92,7 +92,7 @@ SENSORS: tuple[ContryModSensorDescription, ...] = (
         entity_registry_enabled_default=False,
         value_fn=lambda state: state.remaining_open_time,
     ),
-    ContryModSensorDescription(
+    CountryModSensorDescription(
         key="remaining_close_time",
         translation_key="remaining_close_time",
         device_class=SensorDeviceClass.DURATION,
@@ -106,22 +106,22 @@ SENSORS: tuple[ContryModSensorDescription, ...] = (
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ContryModConfigEntry,
+    entry: CountryModConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the sensors."""
     coordinator = entry.runtime_data
     async_add_entities(
-        ContryModSensor(coordinator, description) for description in SENSORS
+        CountryModSensor(coordinator, description) for description in SENSORS
     )
 
 
-class ContryModSensor(ContryModEntity, SensorEntity):
+class CountryModSensor(CountryModEntity, SensorEntity):
     """A single decoded field from the state frame."""
 
-    entity_description: ContryModSensorDescription
+    entity_description: CountryModSensorDescription
 
-    def __init__(self, coordinator, description: ContryModSensorDescription) -> None:
+    def __init__(self, coordinator, description: CountryModSensorDescription) -> None:
         super().__init__(coordinator)
         self.entity_description = description
         self._attr_unique_id = f"{coordinator.address}_{description.key}"

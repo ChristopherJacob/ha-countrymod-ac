@@ -1,4 +1,4 @@
-"""Frame codec for the ContryMod / AeroLink Core BLE air conditioner.
+"""Frame codec for the CountryMod / AeroLink Core BLE air conditioner.
 
 This module owns every raw byte. It has no Home Assistant or Bluetooth
 dependency so it can be exercised directly by unit tests.
@@ -160,7 +160,7 @@ def encode_timer_value(hours: int, minute_index: int) -> int:
 
 
 @dataclass(frozen=True, slots=True)
-class ContryModState:
+class CountryModState:
     """Decoded controller state."""
 
     power: bool
@@ -223,7 +223,7 @@ def validate_frame(frame: bytes) -> None:
         )
 
 
-def decode_state(frame: bytes) -> ContryModState:
+def decode_state(frame: bytes) -> CountryModState:
     """Decode a complete state frame.
 
     Raises ProtocolError if the frame is malformed.
@@ -236,7 +236,7 @@ def decode_state(frame: bytes) -> ContryModState:
 
     status = frame[2]
     flags = frame[3]
-    return ContryModState(
+    return CountryModState(
         power=bool((status >> 7) & 1),
         mode=(status >> 4) & 0x07,
         fan_speed=(status >> 1) & 0x07,
@@ -311,13 +311,13 @@ class FrameReassembler:
             self._buffer.clear()
         return frames
 
-    def add_and_decode(self, data: bytes) -> list[ContryModState]:
+    def add_and_decode(self, data: bytes) -> list[CountryModState]:
         """Append bytes and return decoded state for every valid frame.
 
         Malformed frames are dropped rather than raising, so one corrupt
         notification cannot stall the stream.
         """
-        states: list[ContryModState] = []
+        states: list[CountryModState] = []
         for frame in self.add(data):
             try:
                 states.append(decode_state(frame))

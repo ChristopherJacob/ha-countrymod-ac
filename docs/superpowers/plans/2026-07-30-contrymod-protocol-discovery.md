@@ -1,8 +1,8 @@
-# ContryMod BLE Protocol Discovery Implementation Plan
+# CountryMod BLE Protocol Discovery Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Recover and validate the AeroLink Core BLE protocol well enough to implement a safe Home Assistant integration for the ContryMod 12 V AC.
+**Goal:** Recover and validate the AeroLink Core BLE protocol well enough to implement a safe Home Assistant integration for the CountryMod 12 V AC.
 
 **Architecture:** This is the first of two delivery plans. It produces an evidence-backed protocol contract: the controller fingerprint, GATT layout, command frames, and state frames. A later plan will consume that fixed contract to build the custom integration; it must not guess UUIDs or command bytes.
 
@@ -173,7 +173,7 @@ Expected: no output. The census document must not claim that any write, pairing,
 
 ```bash
 git add docs/protocol-discovery/gatt-census.md
-git commit -m "docs: record ContryMod GATT census"
+git commit -m "docs: record CountryMod GATT census"
 ```
 
 ### Task 4: Validate the recovered protocol at the AC
@@ -206,7 +206,7 @@ Mark a row `pass` only when the outgoing frame, expected acknowledgement/state f
 
 ```bash
 git add docs/protocol-discovery/command-validation.md
-git commit -m "docs: validate ContryMod BLE control frames"
+git commit -m "docs: validate CountryMod BLE control frames"
 ```
 
 The committed document contains frame formats and anonymized samples only. Raw transcripts remain under ignored `artifacts/ble-captures/`.
@@ -234,9 +234,9 @@ Expected: each required control appears once in the Commands table with a passin
 
 ```bash
 git add docs/protocol-discovery/protocol-contract.md
-git commit -m "docs: define ContryMod BLE protocol contract"
+git commit -m "docs: define CountryMod BLE protocol contract"
 ```
 
 - [ ] **Step 4: Create the second implementation plan only after contract approval**
 
-The next plan uses `docs/protocol-discovery/protocol-contract.md` as its protocol authority and creates `custom_components/contrymod_ac/`, config flow, coordinator, climate platform, recirculation switch, diagnostics, translations, and fixture-driven tests. It must include the exact UUIDs, command construction, decoder, and test fixtures captured above.
+The next plan uses `docs/protocol-discovery/protocol-contract.md` as its protocol authority and creates `custom_components/countrymod_ac/`, config flow, coordinator, climate platform, recirculation switch, diagnostics, translations, and fixture-driven tests. It must include the exact UUIDs, command construction, decoder, and test fixtures captured above.

@@ -1,4 +1,4 @@
-"""Tests for the ContryMod frame codec.
+"""Tests for the CountryMod frame codec.
 
 Fixtures marked "captured" are verbatim frames recorded from the live
 controller on 2026-08-01; see docs/protocol-discovery/command-validation.md.
@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import pytest
 
-from custom_components.contrymod_ac.protocol import (
+from custom_components.countrymod_ac.protocol import (
     Command,
     FrameReassembler,
     ModeCommand,

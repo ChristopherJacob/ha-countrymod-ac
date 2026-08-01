@@ -3,11 +3,11 @@
     "flow_title": "{name}",
     "step": {
       "confirm": {
-        "title": "Add ContryMod air conditioner",
+        "title": "Add CountryMod air conditioner",
         "description": "Set up {name} ({address})?"
       },
       "user": {
-        "title": "Add ContryMod air conditioner",
+        "title": "Add CountryMod air conditioner",
         "data": {
           "address": "Controller"
         }
@@ -15,14 +15,14 @@
     },
     "abort": {
       "already_configured": "This controller is already set up.",
-      "no_devices_found": "No ContryMod controllers were found in range. Make sure the unit is powered and that the AeroLink Core app is not connected to it.",
-      "not_supported": "This Bluetooth device is not a ContryMod controller."
+      "no_devices_found": "No CountryMod controllers were found in range. Make sure the unit is powered and that the AeroLink Core app is not connected to it.",
+      "not_supported": "This Bluetooth device is not a CountryMod controller."
     }
   },
   "options": {
     "step": {
       "init": {
-        "title": "ContryMod options",
+        "title": "CountryMod options",
         "data": {
           "scan_interval": "Seconds between state refreshes"
         }

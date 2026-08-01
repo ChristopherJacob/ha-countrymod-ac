@@ -1,9 +1,9 @@
-# ContryMod BLE Home Assistant Integration
+# CountryMod BLE Home Assistant Integration
 
 ## Goal
 
 Create a Home Assistant custom integration for the Bluetooth-enabled 12 V
-ContryMod RV air conditioner. Version 1 exposes the controls available in the
+CountryMod RV air conditioner. Version 1 exposes the controls available in the
 official AeroLink Core app: power, target temperature, operating mode, and
 recirculation.
 
@@ -58,7 +58,7 @@ only if app inspection and direct GATT validation cannot recover the protocol.
 Home Assistant config flow / Bluetooth discovery
                  |
                  v
-        ContryMod coordinator
+        CountryMod coordinator
       (connection and refresh lifecycle)
                  |
                  v

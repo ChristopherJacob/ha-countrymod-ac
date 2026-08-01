@@ -1,4 +1,4 @@
-# ContryMod BLE command validation
+# CountryMod BLE command validation
 
 Physical validation performed 2026-08-01 (UTC) from the RV Home Assistant host
 against the live controller. Raw transcripts are stored locally under the

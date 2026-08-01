@@ -1,4 +1,4 @@
-"""Connection and refresh lifecycle for the ContryMod controller."""
+"""Connection and refresh lifecycle for the CountryMod controller."""
 
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ from .const import (
 )
 from .protocol import (
     Command,
-    ContryModState,
+    CountryModState,
     FrameReassembler,
     build_command,
     build_query,
@@ -34,7 +34,7 @@ from .protocol import (
 _LOGGER = logging.getLogger(__name__)
 
 
-class ContryModCoordinator(DataUpdateCoordinator[ContryModState]):
+class CountryModCoordinator(DataUpdateCoordinator[CountryModState]):
     """Owns the BLE connection and serialises every exchange with the AC.
 
     Entities never touch the transport. They call the command helpers here,
@@ -64,7 +64,7 @@ class ContryModCoordinator(DataUpdateCoordinator[ContryModState]):
         self._reassembler = FrameReassembler()
         self._lock = asyncio.Lock()
         self._state_event = asyncio.Event()
-        self._latest: ContryModState | None = None
+        self._latest: CountryModState | None = None
         self._expected_disconnect = False
 
     @property
@@ -147,7 +147,7 @@ class ContryModCoordinator(DataUpdateCoordinator[ContryModState]):
         # Write Command (no response) is what was validated against the unit.
         await client.write_gatt_char(WRITE_CHAR_UUID, frame, response=False)
 
-    async def _request_state(self) -> ContryModState:
+    async def _request_state(self) -> CountryModState:
         """Write a query and wait for the resulting state frame."""
         self._state_event.clear()
         await self._write(build_query(Command.REFRESH, self.kind_code))
@@ -165,7 +165,7 @@ class ContryModCoordinator(DataUpdateCoordinator[ContryModState]):
 
     # -- coordinator -------------------------------------------------------
 
-    async def _async_update_data(self) -> ContryModState:
+    async def _async_update_data(self) -> CountryModState:
         async with self._lock:
             try:
                 return await self._request_state()
@@ -179,7 +179,7 @@ class ContryModCoordinator(DataUpdateCoordinator[ContryModState]):
 
     # -- commands ----------------------------------------------------------
 
-    async def async_send_command(self, code: int, value: int) -> ContryModState:
+    async def async_send_command(self, code: int, value: int) -> CountryModState:
         """Send one command and refresh state from the controller.
 
         Returns the state the controller reported afterwards, so callers see

@@ -1,12 +1,12 @@
-"""Constants for the ContryMod RV air conditioner integration."""
+"""Constants for the CountryMod RV air conditioner integration."""
 
 from __future__ import annotations
 
 from typing import Final
 
-DOMAIN: Final = "contrymod_ac"
+DOMAIN: Final = "countrymod_ac"
 
-MANUFACTURER: Final = "ContryMod"
+MANUFACTURER: Final = "CountryMod"
 MODEL: Final = "12V/24V RV Air Conditioner (AeroLink Core)"
 
 SERVICE_UUID: Final = "0000ffe0-0000-1000-8000-00805f9b34fb"

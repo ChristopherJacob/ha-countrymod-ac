@@ -1,4 +1,4 @@
-"""Binary sensor platform for the ContryMod RV air conditioner."""
+"""Binary sensor platform for the CountryMod RV air conditioner."""
 
 from __future__ import annotations
 
@@ -10,20 +10,20 @@ from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import ContryModConfigEntry
-from .entity import ContryModEntity
+from . import CountryModConfigEntry
+from .entity import CountryModEntity
 
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ContryModConfigEntry,
+    entry: CountryModConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the fault indicator."""
-    async_add_entities([ContryModProblem(entry.runtime_data)])
+    async_add_entities([CountryModProblem(entry.runtime_data)])
 
 
-class ContryModProblem(ContryModEntity, BinarySensorEntity):
+class CountryModProblem(CountryModEntity, BinarySensorEntity):
     """Reports a non-zero fault code from the controller."""
 
     _attr_device_class = BinarySensorDeviceClass.PROBLEM

@@ -1,4 +1,4 @@
-"""Diagnostics for the ContryMod RV air conditioner."""
+"""Diagnostics for the CountryMod RV air conditioner."""
 
 from __future__ import annotations
 
@@ -9,13 +9,13 @@ from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.const import CONF_ADDRESS
 from homeassistant.core import HomeAssistant
 
-from . import ContryModConfigEntry
+from . import CountryModConfigEntry
 
 TO_REDACT = {CONF_ADDRESS, "unique_id", "title"}
 
 
 async def async_get_config_entry_diagnostics(
-    hass: HomeAssistant, entry: ContryModConfigEntry
+    hass: HomeAssistant, entry: CountryModConfigEntry
 ) -> dict[str, Any]:
     """Return diagnostics for a config entry."""
     coordinator = entry.runtime_data

@@ -1,4 +1,4 @@
-# ContryMod GATT census
+# CountryMod GATT census
 
 Captured from the RV host on 2026-07-30 (UTC), including a later successful
 read-only retry. Raw controller transcripts are stored locally in the ignored

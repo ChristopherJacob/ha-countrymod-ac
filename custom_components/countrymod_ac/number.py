@@ -1,4 +1,4 @@
-"""Number platform for the ContryMod RV air conditioner."""
+"""Number platform for the CountryMod RV air conditioner."""
 
 from __future__ import annotations
 
@@ -7,21 +7,21 @@ from homeassistant.const import EntityCategory, UnitOfElectricPotential
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import ContryModConfigEntry
-from .entity import ContryModEntity
+from . import CountryModConfigEntry
+from .entity import CountryModEntity
 from .protocol import Command
 
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ContryModConfigEntry,
+    entry: CountryModConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the under-voltage protection setpoint."""
-    async_add_entities([ContryModUnderVoltage(entry.runtime_data)])
+    async_add_entities([CountryModUnderVoltage(entry.runtime_data)])
 
 
-class ContryModUnderVoltage(ContryModEntity, NumberEntity):
+class CountryModUnderVoltage(CountryModEntity, NumberEntity):
     """Battery cut-off voltage below which the unit stops.
 
     The controller offers different ranges per system voltage; the range here

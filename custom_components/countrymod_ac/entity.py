@@ -1,4 +1,4 @@
-"""Shared entity base for the ContryMod integration."""
+"""Shared entity base for the CountryMod integration."""
 
 from __future__ import annotations
 
@@ -6,16 +6,16 @@ from homeassistant.helpers.device_registry import CONNECTION_BLUETOOTH, DeviceIn
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN, MANUFACTURER, MODEL
-from .coordinator import ContryModCoordinator
-from .protocol import ContryModState
+from .coordinator import CountryModCoordinator
+from .protocol import CountryModState
 
 
-class ContryModEntity(CoordinatorEntity[ContryModCoordinator]):
+class CountryModEntity(CoordinatorEntity[CountryModCoordinator]):
     """Base entity bound to one controller."""
 
     _attr_has_entity_name = True
 
-    def __init__(self, coordinator: ContryModCoordinator) -> None:
+    def __init__(self, coordinator: CountryModCoordinator) -> None:
         super().__init__(coordinator)
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, coordinator.address)},
@@ -26,7 +26,7 @@ class ContryModEntity(CoordinatorEntity[ContryModCoordinator]):
         )
 
     @property
-    def state_data(self) -> ContryModState | None:
+    def state_data(self) -> CountryModState | None:
         """Latest decoded state, or None while the controller is unreachable."""
         return self.coordinator.data
 

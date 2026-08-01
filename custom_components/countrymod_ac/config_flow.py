@@ -1,4 +1,4 @@
-"""Config flow for the ContryMod RV air conditioner."""
+"""Config flow for the CountryMod RV air conditioner."""
 
 from __future__ import annotations
 
@@ -51,7 +51,7 @@ def _is_supported(info: BluetoothServiceInfoBleak) -> bool:
     return name.startswith(NAME_PREFIX) or name == GAP_NAME
 
 
-class ContryModConfigFlow(ConfigFlow, domain=DOMAIN):
+class CountryModConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle discovery and manual setup."""
 
     VERSION = 1
@@ -137,10 +137,10 @@ class ContryModConfigFlow(ConfigFlow, domain=DOMAIN):
     @staticmethod
     @callback
     def async_get_options_flow(entry: ConfigEntry) -> OptionsFlow:
-        return ContryModOptionsFlow()
+        return CountryModOptionsFlow()
 
 
-class ContryModOptionsFlow(OptionsFlow):
+class CountryModOptionsFlow(OptionsFlow):
     """Adjust how often the controller is polled."""
 
     async def async_step_init(

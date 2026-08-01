@@ -1,4 +1,4 @@
-"""The ContryMod RV air conditioner integration."""
+"""The CountryMod RV air conditioner integration."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
 from .const import CONF_KIND_CODE, CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
-from .coordinator import ContryModCoordinator
+from .coordinator import CountryModCoordinator
 from .protocol import DEFAULT_KIND_CODE
 
 PLATFORMS: list[Platform] = [
@@ -20,12 +20,12 @@ PLATFORMS: list[Platform] = [
     Platform.SWITCH,
 ]
 
-type ContryModConfigEntry = ConfigEntry[ContryModCoordinator]
+type CountryModConfigEntry = ConfigEntry[CountryModCoordinator]
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ContryModConfigEntry) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: CountryModConfigEntry) -> bool:
     """Set up a controller from a config entry."""
-    coordinator = ContryModCoordinator(
+    coordinator = CountryModCoordinator(
         hass,
         entry,
         address=entry.data[CONF_ADDRESS],
@@ -45,7 +45,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ContryModConfigEntry) ->
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ContryModConfigEntry) -> bool:
+async def async_unload_entry(hass: HomeAssistant, entry: CountryModConfigEntry) -> bool:
     """Unload a config entry and release the Bluetooth connection."""
     unloaded = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unloaded:
@@ -53,6 +53,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ContryModConfigEntry) -
     return unloaded
 
 
-async def _async_reload_entry(hass: HomeAssistant, entry: ContryModConfigEntry) -> None:
+async def _async_reload_entry(
+    hass: HomeAssistant, entry: CountryModConfigEntry
+) -> None:
     """Reload when options change, so the new poll interval takes effect."""
     await hass.config_entries.async_reload(entry.entry_id)

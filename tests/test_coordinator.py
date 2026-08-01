@@ -1,4 +1,4 @@
-"""Tests for the ContryMod coordinator against a fake BLE client.
+"""Tests for the CountryMod coordinator against a fake BLE client.
 
 These cover the behaviour that only shows up on real hardware: notifications
 arrive fragmented, a completed write is not proof the controller acted, and a
@@ -16,9 +16,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import UpdateFailed
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.contrymod_ac.const import DOMAIN
-from custom_components.contrymod_ac.coordinator import ContryModCoordinator
-from custom_components.contrymod_ac.protocol import Command, build_command
+from custom_components.countrymod_ac.const import DOMAIN
+from custom_components.countrymod_ac.coordinator import CountryModCoordinator
+from custom_components.countrymod_ac.protocol import Command, build_command
 
 ADDRESS = "AA:BB:CC:DD:EE:FF"
 
@@ -109,17 +109,17 @@ def coordinator(hass: HomeAssistant, fake_client: FakeClient):
     """A coordinator wired to the fake client."""
     entry = MockConfigEntry(domain=DOMAIN, title="KT2000000000000")
     entry.add_to_hass(hass)
-    coordinator = ContryModCoordinator(
+    coordinator = CountryModCoordinator(
         hass, entry, address=ADDRESS, kind_code=1, scan_interval=15
     )
     with (
         patch(
-            "custom_components.contrymod_ac.coordinator.bluetooth"
+            "custom_components.countrymod_ac.coordinator.bluetooth"
             ".async_ble_device_from_address",
             return_value=object(),
         ),
         patch(
-            "custom_components.contrymod_ac.coordinator.establish_connection",
+            "custom_components.countrymod_ac.coordinator.establish_connection",
             return_value=fake_client,
         ),
     ):
@@ -158,7 +158,7 @@ async def test_silence_after_query_drops_the_connection(coordinator, fake_client
     await coordinator.async_refresh()
     fake_client.answer_queries = False
 
-    with patch("custom_components.contrymod_ac.coordinator.STATE_TIMEOUT", 0.05):
+    with patch("custom_components.countrymod_ac.coordinator.STATE_TIMEOUT", 0.05):
         await coordinator.async_refresh()
 
     assert not coordinator.last_update_success
@@ -182,7 +182,7 @@ async def test_failed_subscription_does_not_leak_a_connection(
 ):
     entry = MockConfigEntry(domain=DOMAIN, title="KT")
     entry.add_to_hass(hass)
-    coordinator = ContryModCoordinator(
+    coordinator = CountryModCoordinator(
         hass, entry, address=ADDRESS, kind_code=1, scan_interval=15
     )
 
@@ -192,12 +192,12 @@ async def test_failed_subscription_does_not_leak_a_connection(
     fake_client.start_notify = boom
     with (
         patch(
-            "custom_components.contrymod_ac.coordinator.bluetooth"
+            "custom_components.countrymod_ac.coordinator.bluetooth"
             ".async_ble_device_from_address",
             return_value=object(),
         ),
         patch(
-            "custom_components.contrymod_ac.coordinator.establish_connection",
+            "custom_components.countrymod_ac.coordinator.establish_connection",
             return_value=fake_client,
         ),
     ):
@@ -210,11 +210,11 @@ async def test_failed_subscription_does_not_leak_a_connection(
 async def test_out_of_range_controller_fails_cleanly(hass: HomeAssistant):
     entry = MockConfigEntry(domain=DOMAIN, title="KT")
     entry.add_to_hass(hass)
-    coordinator = ContryModCoordinator(
+    coordinator = CountryModCoordinator(
         hass, entry, address=ADDRESS, kind_code=1, scan_interval=15
     )
     with patch(
-        "custom_components.contrymod_ac.coordinator.bluetooth"
+        "custom_components.countrymod_ac.coordinator.bluetooth"
         ".async_ble_device_from_address",
         return_value=None,
     ):
@@ -242,17 +242,17 @@ async def test_commands_are_serialised(coordinator, fake_client):
 async def test_kind_code_is_used_in_every_frame(hass: HomeAssistant, fake_client):
     entry = MockConfigEntry(domain=DOMAIN, title="KT")
     entry.add_to_hass(hass)
-    coordinator = ContryModCoordinator(
+    coordinator = CountryModCoordinator(
         hass, entry, address=ADDRESS, kind_code=3, scan_interval=15
     )
     with (
         patch(
-            "custom_components.contrymod_ac.coordinator.bluetooth"
+            "custom_components.countrymod_ac.coordinator.bluetooth"
             ".async_ble_device_from_address",
             return_value=object(),
         ),
         patch(
-            "custom_components.contrymod_ac.coordinator.establish_connection",
+            "custom_components.countrymod_ac.coordinator.establish_connection",
             return_value=fake_client,
         ),
     ):

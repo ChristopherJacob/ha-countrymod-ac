@@ -10,7 +10,7 @@ from __future__ import annotations
 from homeassistant.core import HomeAssistant
 from homeassistant.loader import async_get_custom_components, async_get_integration
 
-from custom_components.contrymod_ac.const import DOMAIN
+from custom_components.countrymod_ac.const import DOMAIN
 
 
 async def test_custom_integration_is_discovered(hass: HomeAssistant):

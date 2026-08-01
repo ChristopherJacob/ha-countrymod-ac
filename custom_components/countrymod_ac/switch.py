@@ -1,4 +1,4 @@
-"""Switch platform for the ContryMod RV air conditioner."""
+"""Switch platform for the CountryMod RV air conditioner."""
 
 from __future__ import annotations
 
@@ -9,26 +9,26 @@ from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import ContryModConfigEntry
-from .entity import ContryModEntity
+from . import CountryModConfigEntry
+from .entity import CountryModEntity
 from .protocol import Command
 
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ContryModConfigEntry,
+    entry: CountryModConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the panel display and light switches."""
     async_add_entities(
         [
-            ContryModScreenDisplay(entry.runtime_data),
-            ContryModLight(entry.runtime_data),
+            CountryModScreenDisplay(entry.runtime_data),
+            CountryModLight(entry.runtime_data),
         ]
     )
 
 
-class ContryModScreenDisplay(ContryModEntity, SwitchEntity):
+class CountryModScreenDisplay(CountryModEntity, SwitchEntity):
     """The controller's own panel display."""
 
     _attr_entity_category = EntityCategory.CONFIG
@@ -50,7 +50,7 @@ class ContryModScreenDisplay(ContryModEntity, SwitchEntity):
         await self.coordinator.async_send_command(Command.SCREEN_DISPLAY, 1)
 
 
-class ContryModLight(ContryModEntity, SwitchEntity):
+class CountryModLight(CountryModEntity, SwitchEntity):
     """The controller's ambient light.
 
     The vendor app cycles this through three values, but the controller only

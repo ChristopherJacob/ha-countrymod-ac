@@ -7,7 +7,7 @@ effect. See docs/protocol-discovery/command-validation.md.
 
 from __future__ import annotations
 
-from custom_components.contrymod_ac.protocol import ModeState, decode_state
+from custom_components.countrymod_ac.protocol import ModeState, decode_state
 
 
 def h(text: str) -> bytes:

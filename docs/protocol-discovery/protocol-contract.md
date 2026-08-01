@@ -1,4 +1,4 @@
-# ContryMod BLE protocol contract
+# CountryMod BLE protocol contract
 
 This is the protocol authority for the Home Assistant integration. Every entry
 is either physically validated (see `command-validation.md`) or marked as

@@ -1,4 +1,4 @@
-"""Select platform for the ContryMod RV air conditioner."""
+"""Select platform for the CountryMod RV air conditioner."""
 
 from __future__ import annotations
 
@@ -7,8 +7,8 @@ from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import ContryModConfigEntry
-from .entity import ContryModEntity
+from . import CountryModConfigEntry
+from .entity import CountryModEntity
 from .protocol import Command
 
 WIND_SIDE_OPTIONS = ["inner", "outer"]
@@ -16,14 +16,14 @@ WIND_SIDE_OPTIONS = ["inner", "outer"]
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ContryModConfigEntry,
+    entry: CountryModConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the air intake selector."""
-    async_add_entities([ContryModWindSide(entry.runtime_data)])
+    async_add_entities([CountryModWindSide(entry.runtime_data)])
 
 
-class ContryModWindSide(ContryModEntity, SelectEntity):
+class CountryModWindSide(CountryModEntity, SelectEntity):
     """Selects recirculated (inner) or fresh (outer) intake air."""
 
     _attr_entity_category = EntityCategory.CONFIG

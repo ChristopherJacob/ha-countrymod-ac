@@ -26,11 +26,11 @@ unit does not implement — see [Validation status](#validation-status).
 
 ## Installation
 
-Copy `custom_components/contrymod_ac` into your Home Assistant `config`
+Copy `custom_components/countrymod_ac` into your Home Assistant `config`
 directory:
 
 ```
-<config>/custom_components/contrymod_ac/
+<config>/custom_components/countrymod_ac/
 ```
 
 Restart Home Assistant. The controller is discovered automatically — look for a
@@ -141,7 +141,7 @@ python3 -m venv .venv
 .venv/bin/ruff check custom_components tests
 ```
 
-The codec in `custom_components/contrymod_ac/protocol.py` has no Home Assistant
+The codec in `custom_components/countrymod_ac/protocol.py` has no Home Assistant
 or Bluetooth dependency and is tested against frames captured verbatim from the
 real controller.
 

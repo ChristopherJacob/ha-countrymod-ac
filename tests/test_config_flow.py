@@ -10,8 +10,8 @@ from homeassistant.config_entries import SOURCE_BLUETOOTH, SOURCE_USER
 from homeassistant.const import CONF_ADDRESS
 from homeassistant.data_entry_flow import FlowResultType
 
-from custom_components.contrymod_ac.config_flow import _is_supported
-from custom_components.contrymod_ac.const import DOMAIN
+from custom_components.countrymod_ac.config_flow import _is_supported
+from custom_components.countrymod_ac.const import DOMAIN
 
 ADDRESS = "AA:BB:CC:DD:EE:FF"
 
@@ -113,7 +113,7 @@ class TestBluetoothFlow:
 class TestManualFlow:
     async def test_lists_controllers_in_range(self, hass):
         with patch(
-            "custom_components.contrymod_ac.config_flow.async_discovered_service_info",
+            "custom_components.countrymod_ac.config_flow.async_discovered_service_info",
             return_value=[service_info("LS Dis Server")],
         ):
             result = await hass.config_entries.flow.async_init(
@@ -134,7 +134,7 @@ class TestManualFlow:
     )
     async def test_aborts_when_nothing_matches(self, hass, discovered):
         with patch(
-            "custom_components.contrymod_ac.config_flow.async_discovered_service_info",
+            "custom_components.countrymod_ac.config_flow.async_discovered_service_info",
             return_value=discovered,
         ):
             result = await hass.config_entries.flow.async_init(
