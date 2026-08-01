@@ -1,69 +1,61 @@
 #!/usr/bin/env python3
-"""Build icon/logo assets from the CountryMod wordmark.
+"""Build Home Assistant brand assets from the official CountryMod logo.
 
-The source is a small PNG of the wordmark on solid white. White is keyed out to
-transparency and the ink is normalised to the brand blue, so antialiased edges
-stay clean instead of turning into grey fringes.
+Source: the full-resolution PNG from CountryMod's own CDN, which already has a
+real alpha channel. Everything here is a downscale, so no colour keying or edge
+reconstruction is needed and the output stays crisp.
 
-The artwork is only 64x95 px, so reaching a 256/512 icon means upscaling ~3x.
-Plain interpolation turns the thin burst rays to mush, so the alpha channel is
-put through a contrast curve after resampling. For flat two-colour art that
-restores a crisp edge while keeping the antialiasing.
+    python3 tools/make_brand_assets.py <source.png> <output-dir>
+
+The source is one wide lockup: a burst-and-C mark, a gap, then the COUNTRYMOD
+wordmark. The mark is split off at the first wide gap in the alpha channel, so
+this adapts to a re-exported logo without hand-tuned crop boxes.
 """
 
 import sys
 
 from PIL import Image, ImageDraw
 
-SRC, OUT = sys.argv[1], sys.argv[2]
-
-BRAND = (16, 91, 156)  # #105B9C, the dominant ink colour in the source
-BRAND_LUM = 0.299 * BRAND[0] + 0.587 * BRAND[1] + 0.114 * BRAND[2]
-
-MARK_BOX = (72, 176, 136, 271)  # burst + C
-WORD_BOX = (72, 176, 375, 271)  # full COUNTRYMOD wordmark
+MIN_GAP = 16  # px of empty columns separating the mark from the wordmark
 
 
-def keyed(box):
-    """Crop `box` and return brand-coloured ink on transparency."""
-    im = Image.open(SRC).convert("RGB").crop(box)
-    px = im.load()
+def load(path):
+    im = Image.open(path).convert("RGBA")
+    box = im.getchannel("A").getbbox()
+    if box is None:
+        raise SystemExit(f"{path}: image is fully transparent")
+    return im.crop(box)
+
+
+def split_mark(im):
+    """Return the burst-and-C mark, split at the first wide alpha gap."""
+    alpha = im.getchannel("A").load()
     w, h = im.size
-    out = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    op = out.load()
-    for y in range(h):
-        for x in range(w):
-            r, g, b = px[x, y]
-            lum = 0.299 * r + 0.587 * g + 0.114 * b
-            # White -> 0. Anything at or darker than the brand ink -> fully
-            # opaque, so solid areas do not come out semi-transparent.
-            a = 255.0 * (255.0 - lum) / (255.0 - BRAND_LUM)
-            op[x, y] = (*BRAND, max(0, min(255, round(a))))
-    return out
+    step = max(1, h // 400)
+    empty = [all(alpha[x, y] <= 24 for y in range(0, h, step)) for x in range(w)]
+
+    run_start = None
+    for x in range(w):
+        if empty[x]:
+            if run_start is None:
+                run_start = x
+        else:
+            if run_start is not None and x - run_start >= MIN_GAP:
+                mark = im.crop((0, 0, run_start, h))
+                return mark.crop(mark.getchannel("A").getbbox())
+            run_start = None
+    raise SystemExit("could not find a gap separating the mark from the wordmark")
 
 
-def sharpen_alpha(img, k=3.0):
-    """Push the alpha channel through a contrast curve around 50%."""
-    alpha = img.getchannel("A")
-    lut = []
-    for v in range(256):
-        t = (v / 255.0 - 0.5) * k + 0.5
-        lut.append(max(0, min(255, round(t * 255))))
-    out = img.copy()
-    out.putalpha(alpha.point(lut))
-    return out
-
-
-def scale(img, w, h):
-    return sharpen_alpha(img.resize((w, h), Image.LANCZOS))
-
-
-def fit(img, size, pad_ratio):
+def square(img, size, pad_ratio):
     """Centre `img` on a transparent square canvas, with padding."""
     canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    inner = int(size * (1 - 2 * pad_ratio))
+    inner = size * (1 - 2 * pad_ratio)
     f = min(inner / img.width, inner / img.height)
-    new = scale(img, max(1, round(img.width * f)), max(1, round(img.height * f)))
+    new = img.resize(
+        (max(1, round(img.width * f)), max(1, round(img.height * f))),
+        Image.LANCZOS,
+    )
     canvas.paste(new, ((size - new.width) // 2, (size - new.height) // 2), new)
     return canvas
 
@@ -71,38 +63,46 @@ def fit(img, size, pad_ratio):
 def on_white(img, radius_ratio=0.18):
     """Same artwork over a white rounded square, for dark backgrounds."""
     size = img.width
-    bg = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    out = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     mask = Image.new("L", (size, size), 0)
     ImageDraw.Draw(mask).rounded_rectangle(
-        (0, 0, size - 1, size - 1), radius=int(size * radius_ratio), fill=255
+        (0, 0, size - 1, size - 1), radius=round(size * radius_ratio), fill=255
     )
-    bg.paste(Image.new("RGBA", (size, size), (255, 255, 255, 255)), (0, 0), mask)
-    bg.alpha_composite(img)
-    return bg
+    out.paste(Image.new("RGBA", (size, size), (255, 255, 255, 255)), (0, 0), mask)
+    out.alpha_composite(img)
+    return out
 
 
-mark, word = keyed(MARK_BOX), keyed(WORD_BOX)
-print("mark ink:", mark.size, " wordmark ink:", word.size)
+def wide(img, width):
+    return img.resize((width, round(width * img.height / img.width)), Image.LANCZOS)
 
-fit(mark, 256, 0.12).save(f"{OUT}/icon.png")
-fit(mark, 512, 0.12).save(f"{OUT}/icon@2x.png")
-on_white(fit(mark, 256, 0.18)).save(f"{OUT}/icon-on-white.png")
-on_white(fit(mark, 512, 0.18)).save(f"{OUT}/icon-on-white@2x.png")
 
-scale(word, 512, round(512 * word.height / word.width)).save(f"{OUT}/logo.png")
-scale(word, 1024, round(1024 * word.height / word.width)).save(f"{OUT}/logo@2x.png")
+def main():
+    src, out = sys.argv[1], sys.argv[2]
+    lockup = load(src)
+    mark = split_mark(lockup)
+    print(f"source lockup: {lockup.size}   mark: {mark.size}")
+    if mark.width < 512 or lockup.width < 1024:
+        print("WARNING: source is small; output will be upscaled and soft")
 
-for name in (
-    "icon.png",
-    "icon@2x.png",
-    "icon-on-white.png",
-    "icon-on-white@2x.png",
-    "logo.png",
-    "logo@2x.png",
-):
-    im = Image.open(f"{OUT}/{name}").convert("RGBA")
-    px = im.load()
-    solid = sum(
-        1 for y in range(im.height) for x in range(im.width) if px[x, y][3] == 255
-    )
-    print(f"  {name:22} {im.size[0]}x{im.size[1]}  fully-opaque px: {solid}")
+    square(mark, 256, 0.12).save(f"{out}/brands/icon.png")
+    square(mark, 512, 0.12).save(f"{out}/brands/icon@2x.png")
+    wide(lockup, 512).save(f"{out}/brands/logo.png")
+    wide(lockup, 1024).save(f"{out}/brands/logo@2x.png")
+    on_white(square(mark, 256, 0.18)).save(f"{out}/icon-on-white.png")
+    on_white(square(mark, 512, 0.18)).save(f"{out}/icon-on-white@2x.png")
+
+    for name in (
+        "brands/icon.png",
+        "brands/icon@2x.png",
+        "brands/logo.png",
+        "brands/logo@2x.png",
+        "icon-on-white.png",
+        "icon-on-white@2x.png",
+    ):
+        im = Image.open(f"{out}/{name}")
+        print(f"  {name:24} {im.size[0]}x{im.size[1]}")
+
+
+if __name__ == "__main__":
+    main()
