@@ -47,8 +47,13 @@ def split_mark(im):
     raise SystemExit("could not find a gap separating the mark from the wordmark")
 
 
-def square(img, size, pad_ratio):
-    """Centre `img` on a transparent square canvas, with padding."""
+def square(img, size, pad_ratio=0.0):
+    """Centre `img` on a transparent square canvas.
+
+    Home Assistant's brand spec requires images be trimmed to the minimum
+    empty space on the edges, transparent padding included, so the default is
+    no padding: the mark touches the canvas on its longer axis.
+    """
     canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     inner = size * (1 - 2 * pad_ratio)
     f = min(inner / img.width, inner / img.height)
@@ -73,8 +78,20 @@ def on_white(img, radius_ratio=0.18):
     return out
 
 
-def wide(img, width):
-    return img.resize((width, round(width * img.height / img.width)), Image.LANCZOS)
+def by_short_side(img, short):
+    """Scale so the shortest side is exactly `short` px.
+
+    The logo spec constrains the short side (128-256 normal, 256-512 hDPI) and
+    leaves the long side to follow the brand's own aspect ratio.
+    """
+    f = short / min(img.width, img.height)
+    return img.resize(
+        (round(img.width * f), round(img.height * f)), Image.LANCZOS
+    )
+
+
+def save(img, path):
+    img.save(path, optimize=True)
 
 
 def main():
@@ -85,12 +102,12 @@ def main():
     if mark.width < 512 or lockup.width < 1024:
         print("WARNING: source is small; output will be upscaled and soft")
 
-    square(mark, 256, 0.12).save(f"{out}/brands/icon.png")
-    square(mark, 512, 0.12).save(f"{out}/brands/icon@2x.png")
-    wide(lockup, 512).save(f"{out}/brands/logo.png")
-    wide(lockup, 1024).save(f"{out}/brands/logo@2x.png")
-    on_white(square(mark, 256, 0.18)).save(f"{out}/icon-on-white.png")
-    on_white(square(mark, 512, 0.18)).save(f"{out}/icon-on-white@2x.png")
+    save(square(mark, 256), f"{out}/brands/icon.png")
+    save(square(mark, 512), f"{out}/brands/icon@2x.png")
+    save(by_short_side(lockup, 256), f"{out}/brands/logo.png")
+    save(by_short_side(lockup, 512), f"{out}/brands/logo@2x.png")
+    save(on_white(square(mark, 256, 0.18)), f"{out}/icon-on-white.png")
+    save(on_white(square(mark, 512, 0.18)), f"{out}/icon-on-white@2x.png")
 
     for name in (
         "brands/icon.png",

@@ -19,8 +19,8 @@ them.
 | --- | --- | --- |
 | `brands/icon.png` | 256×256 | Square mark, transparent — for a `home-assistant/brands` submission |
 | `brands/icon@2x.png` | 512×512 | Same, 2x |
-| `brands/logo.png` | 512×119 | Full lockup, transparent |
-| `brands/logo@2x.png` | 1024×238 | Same, 2x |
+| `brands/logo.png` | 1103×256 | Full lockup, transparent |
+| `brands/logo@2x.png` | 2206×512 | Same, 2x |
 | `icon-on-white.png` | 256×256 | Mark on a white rounded square, for dark backgrounds |
 | `icon-on-white@2x.png` | 512×512 | Same, 2x |
 | `countrymod-logo-source.png` | 5000×1199 | Unmodified source, kept so the assets can be rebuilt |
@@ -30,13 +30,20 @@ The square icon uses the burst-and-C mark rather than the full lockup, which is
 
 Brand colour: **`#1D73BB`**.
 
-## These do not change the Home Assistant UI
+## How these reach the Home Assistant UI
 
-Home Assistant serves integration icons from `brands.home-assistant.io`, not
-from the integration directory. A custom integration cannot ship its own icon,
-so Home Assistant will keep showing a default placeholder until the assets are
-accepted into [home-assistant/brands](https://github.com/home-assistant/brands).
-Until then these are for the repository README and HACS.
+Since **Home Assistant 2026.3** a custom integration can ship its own brand
+images, and they take priority over the CDN. The copies in
+`custom_components/countrymod_ac/brand/` are what the UI actually uses — no
+pull request and no CDN wait.
+
+For anyone on an older release, the same files are also submitted to
+[home-assistant/brands](https://github.com/home-assistant/brands) under
+`custom_integrations/countrymod_ac/`, which serves them from
+`brands.home-assistant.io`.
+
+Keep the two copies in sync: `tools/make_brand_assets.py` writes `assets/brands/`
+and they are copied into the integration.
 
 ## Provenance
 
@@ -62,6 +69,16 @@ The script locates the mark by finding the first wide gap in the alpha channel
 rather than using hard-coded crop boxes, so it should survive a re-exported
 logo. It warns if handed a source small enough that the output would be
 upscaled.
+
+Verify the result against the published specification with:
+
+```bash
+python3 tools/check_brand_assets.py assets/brands
+```
+
+That checks filetype, 1:1 icon aspect at exactly 256/512, the logo's short side
+against the 128-256 and 256-512 bands, and that images are trimmed to minimum
+empty space. It exits non-zero on any violation.
 
 ### Earlier revision
 
