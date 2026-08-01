@@ -1,0 +1,85 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "confirm": {
+        "title": "Add ContryMod air conditioner",
+        "description": "Set up {name} ({address})?"
+      },
+      "user": {
+        "title": "Add ContryMod air conditioner",
+        "data": {
+          "address": "Controller"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "This controller is already set up.",
+      "no_devices_found": "No ContryMod controllers were found in range. Make sure the unit is powered and that the AeroLink Core app is not connected to it.",
+      "not_supported": "This Bluetooth device is not a ContryMod controller."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "ContryMod options",
+        "data": {
+          "scan_interval": "Seconds between state refreshes"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "unsupported_hvac_mode": {
+      "message": "The controller does not support the mode {mode}."
+    },
+    "invalid_fan_mode": {
+      "message": "{mode} is not a valid fan speed. Use 1 through 6."
+    }
+  },
+  "entity": {
+    "climate": {
+      "air_conditioner": {
+        "state_attributes": {
+          "preset_mode": {
+            "state": {
+              "none": "None",
+              "auto": "Auto",
+              "eco": "Eco",
+              "sleep": "Sleep",
+              "turbo": "Turbo"
+            }
+          }
+        }
+      }
+    },
+    "binary_sensor": {
+      "problem": { "name": "Fault" }
+    },
+    "sensor": {
+      "inlet_temperature": { "name": "Inlet temperature" },
+      "core_temperature": { "name": "Coil temperature" },
+      "voltage": { "name": "Supply voltage" },
+      "fault_code": { "name": "Fault code" },
+      "compressor_current": { "name": "Compressor current (raw)" },
+      "fan_current": { "name": "Fan current (raw)" },
+      "remaining_open_time": { "name": "Timer remaining until on" },
+      "remaining_close_time": { "name": "Timer remaining until off" }
+    },
+    "switch": {
+      "screen_display": { "name": "Panel display" }
+    },
+    "select": {
+      "wind_side": {
+        "name": "Air intake",
+        "state": {
+          "inner": "Recirculate",
+          "outer": "Fresh air"
+        }
+      }
+    },
+    "number": {
+      "under_voltage": { "name": "Low voltage cut-off" }
+    }
+  }
+}

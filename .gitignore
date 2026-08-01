@@ -9,3 +9,6 @@ artifacts/
 *.apk
 *.aab
 *.ipa
+
+# Local development environment
+.venv/
