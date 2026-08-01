@@ -25,8 +25,8 @@ wrong, and the cause was tooling, not the device:
 
 The one genuine earlier observation — that a power-off frame produced no
 physical change — was never confirmed against a state frame, so it cannot be
-distinguished from a mis-parsed write. Power was not re-tested in this session
-(see *Not validated* below).
+distinguished from a mis-parsed write. Power was later validated through the
+integration and works correctly, which supports the mis-parsed-write reading.
 
 ## Method
 
@@ -91,7 +91,7 @@ each group, and the controller finished in exactly its starting state.
   whatsoever, where every other mode command changed state within one poll.
   This appears to be a cooling-only model. The frame itself is well formed and
   the same code path works for COOL, FAN, and DRY, so this is the unit
-  declining the mode rather than a malformed command. Other ContryMod models
+  declining the mode rather than a malformed command. Other CountryMod models
   may well accept it.
 - **ECO clears the base mode field.** While ECO is engaged, `byte[2]` bits 6–4
   read `0`, which is not one of the controller's own mode values. SLEEP, TURBO
@@ -107,6 +107,26 @@ each group, and the controller finished in exactly its starting state.
   bit; value 2 clears it; value 0 leaves it clear. It is a switch, not a level.
 - **DRY forces the fan to speed 1**, and TURBO raised it to 5. Fan speed is a
   side effect of some mode changes, so it should be re-read after one.
+
+## Third round: power, through the integration (2026-08-01)
+
+Power was the one control deliberately left for a supervised run, because
+cycling a compressor unattended risks short-cycling it. It was exercised from
+the Home Assistant climate card with the operator at the vehicle, and is
+recorded here from Home Assistant's own state history rather than from a BLE
+capture.
+
+| Time | Action | Observed |
+| --- | --- | --- |
+| 10:44:31 | Panel display off, then on | `switch` followed within one poll |
+| 10:44:35 | Light on, then off | `switch` followed within one poll |
+| 10:44:46 | **Power off** (`C=1, V=1`) | `climate` → `off` |
+| 10:48:03 | **Power on** (`C=1, V=2`) | `climate` → `cool`, 3 min 17 s later |
+| 10:48:04 | — | unit came back reporting the `auto` modifier |
+
+Power on/off therefore behaves exactly as the static analysis predicted, and
+the whole command path — Home Assistant service call, coordinator, FFE2 write,
+confirming query, decoded state frame — is confirmed on real hardware.
 
 ## Confirmed send/receive mode asymmetry
 
@@ -151,10 +171,6 @@ app's `Vt` enum and its `workMode` comparisons.
 
 ## Still not validated
 
-- **Power on/off** (`C=1`, V=1 off / V=2 on). Not exercised: cycling a
-  compressor unattended risks short-cycling it, and the command was the one
-  step deliberately left for a supervised run. It is the same frame format as
-  every command that passed.
 - **Negative ion.** The state frame decodes the flag (`byte[3]` bit 2), but no
   command code for it was found in the app, so there is nothing to send.
 - **HEAT on a unit that supports heating.** This unit declined it.

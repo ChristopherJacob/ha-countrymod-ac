@@ -11,9 +11,9 @@ board over BLE.
 
 The wire protocol was recovered by decompiling the vendor app and then validated
 against a physical unit. Every control this integration exposes has been
-confirmed on real hardware except **power on/off** and **HEAT** — see
-[Validation status](#validation-status) before trusting those two in an
-automation.
+confirmed on real hardware, and the integration itself has been driven end to
+end from the Home Assistant UI. The one exception is **HEAT**, which the test
+unit does not implement — see [Validation status](#validation-status).
 
 ## Requirements
 
@@ -87,25 +87,27 @@ Full details, including the byte layout and the evidence for each field, are in
 
 ## Validation status
 
-Confirmed against the physical unit, each verified by a returned state frame and
-then restored to its original value:
+Confirmed against the physical unit, each verified by a returned state frame:
 
 - state refresh and full state decoding
+- power on and off
 - target temperature, fan speed
 - work modes COOL, FAN and DRY
 - presets ECO, SLEEP, TURBO and AUTO
 - swing, panel display, light, air intake
 - low voltage cut-off, temperature unit, timer enable / value / disable
 
-**Not** yet exercised on hardware:
+Every one of these has also been exercised from the Home Assistant UI against
+the real unit, so the whole path — service call, coordinator, GATT write,
+confirming query, decoded state — is known to work, not just the frame format.
 
-- **Power on/off.** The frame is the same shape as everything above, but
-  cycling a compressor unattended risks short-cycling it, so this was left for
-  a supervised run.
+**Not** confirmed:
+
 - **HEAT.** The test unit ignored the mode command completely — it appears to
   be a cooling-only model. Other CountryMod units may accept it. The integration
-  raises an error rather than silently doing nothing when the unit declines a
-  mode.
+  raises an error rather than silently doing nothing when a unit declines a
+  mode, so you will get a clear failure rather than a control that does
+  nothing.
 - **Negative ion.** The state flag decodes, but the vendor app has no command
   code for it, so there is nothing to send.
 

@@ -82,7 +82,7 @@ app's own 3-second refresh poll and is the preferred way to request state.
 | Control | `CODE` | Values | Status |
 | --- | --- | --- | --- |
 | State refresh | `0xFF` | `0` | **validated** |
-| Power | `1` | `1` = off, `2` = on | static only |
+| Power | `1` | `1` = off, `2` = on | **validated** |
 | Work mode | `2` | COOL=1, FAN=2, ECO=4, SLEEP=5, TURBO=6, DRY=7, HEAT=8, AUTO=9 | COOL, FAN, DRY, ECO, SLEEP, TURBO, AUTO **validated**; HEAT declined by the test unit |
 | Target temperature | `3` | 16–30 (°C) or 61–86 (°F), sent as the displayed integer | **validated** (°F) |
 | Fan speed | `4` | 1–6 | **validated** |
