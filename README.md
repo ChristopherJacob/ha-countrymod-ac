@@ -2,6 +2,11 @@
 
 # CountryMod RV Air Conditioner — Home Assistant integration
 
+[![Validate](https://github.com/ChristopherJacob/ha-countrymod-ac/actions/workflows/validate.yml/badge.svg)](https://github.com/ChristopherJacob/ha-countrymod-ac/actions/workflows/validate.yml)
+[![Test](https://github.com/ChristopherJacob/ha-countrymod-ac/actions/workflows/test.yml/badge.svg)](https://github.com/ChristopherJacob/ha-countrymod-ac/actions/workflows/test.yml)
+[![Release](https://img.shields.io/github/v/release/ChristopherJacob/ha-countrymod-ac)](https://github.com/ChristopherJacob/ha-countrymod-ac/releases)
+[![hacs](https://img.shields.io/badge/HACS-custom-41BDF5.svg)](https://hacs.xyz)
+
 Local Bluetooth control for the CountryMod 12 V / 24 V RV air conditioner sold
 with the *Bluetooth Control Panel Upgrade Kit*, whose phone app is **AeroLink
 Core** (`com.kingcontech.btac`).
@@ -25,6 +30,19 @@ unit does not implement — see [Validation status](#validation-status).
   has power.
 
 ## Installation
+
+### HACS
+
+Pending inclusion in the HACS default store
+([hacs/default#9660](https://github.com/hacs/default/pull/9660)). Until that is
+merged, add it as a custom repository:
+
+1. HACS → three-dot menu → **Custom repositories**
+2. Repository: `https://github.com/ChristopherJacob/ha-countrymod-ac`,
+   type **Integration**
+3. Install **CountryMod RV Air Conditioner**, then restart Home Assistant
+
+### Manually
 
 Copy `custom_components/countrymod_ac` into your Home Assistant `config`
 directory:
