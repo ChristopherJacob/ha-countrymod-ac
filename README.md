@@ -1,3 +1,5 @@
+<img src="assets/brands/logo.png" alt="CountryMod" width="340">
+
 # CountryMod RV Air Conditioner — Home Assistant integration
 
 Local Bluetooth control for the CountryMod 12 V / 24 V RV air conditioner sold
@@ -147,3 +149,6 @@ real controller.
 
 Protocol recovered by static analysis of AeroLink Core 1.0.0 and validated
 against a physical unit. Not affiliated with CountryMod or Kingcontech.
+
+The CountryMod name and logo are the property of CountryMod and are used only to
+identify the supported device. See [`assets/README.md`](assets/README.md).
