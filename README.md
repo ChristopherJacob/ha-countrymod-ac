@@ -1,6 +1,6 @@
-# ContryMod RV Air Conditioner — Home Assistant integration
+# CountryMod RV Air Conditioner — Home Assistant integration
 
-Local Bluetooth control for the ContryMod 12 V / 24 V RV air conditioner sold
+Local Bluetooth control for the CountryMod 12 V / 24 V RV air conditioner sold
 with the *Bluetooth Control Panel Upgrade Kit*, whose phone app is **AeroLink
 Core** (`com.kingcontech.btac`).
 
@@ -33,10 +33,11 @@ directory:
 
 Restart Home Assistant. The controller is discovered automatically — look for a
 notification under **Settings → Devices & services**, or add it manually with
-**Add integration → ContryMod RV Air Conditioner**.
+**Add integration → CountryMod RV Air Conditioner**.
 
 Controllers advertise as `KT` followed by a serial number, e.g.
-`KT2026020005224`.
+`KT2026020005224`. Once anything has connected to one, the host caches the
+module's GAP name (`LS Dis Server`) instead, so discovery accepts both.
 
 ## Entities
 
@@ -92,7 +93,7 @@ then restored to its original value:
   cycling a compressor unattended risks short-cycling it, so this was left for
   a supervised run.
 - **HEAT.** The test unit ignored the mode command completely — it appears to
-  be a cooling-only model. Other ContryMod units may accept it. The integration
+  be a cooling-only model. Other CountryMod units may accept it. The integration
   raises an error rather than silently doing nothing when the unit declines a
   mode.
 - **Negative ion.** The state flag decodes, but the vendor app has no command
@@ -133,4 +134,4 @@ real controller.
 ## Credits
 
 Protocol recovered by static analysis of AeroLink Core 1.0.0 and validated
-against a physical unit. Not affiliated with ContryMod or Kingcontech.
+against a physical unit. Not affiliated with CountryMod or Kingcontech.

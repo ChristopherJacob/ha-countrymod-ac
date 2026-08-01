@@ -14,8 +14,14 @@ WRITE_CHAR_UUID: Final = "0000ffe2-0000-1000-8000-00805f9b34fb"
 NOTIFY_CHAR_UUID: Final = "0000ffe1-0000-1000-8000-00805f9b34fb"
 
 #: Controllers advertise their serial as the local name. FFE0 on its own is a
-#: generic serial-bridge UUID, so the name prefix is what identifies the model.
+#: generic serial-bridge UUID, so the name is what identifies the model.
 NAME_PREFIX: Final = "KT"
+
+#: The GAP device name the module reports once anything reads it, which then
+#: replaces the advertised serial in BlueZ's cache. A controller that has ever
+#: been connected to is seen under this name rather than its "KT..." serial, so
+#: discovery has to accept both.
+GAP_NAME: Final = "LS DIS SERVER"
 
 CONF_KIND_CODE: Final = "kind_code"
 CONF_SCAN_INTERVAL: Final = "scan_interval"

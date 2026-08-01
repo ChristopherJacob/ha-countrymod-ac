@@ -1,6 +1,6 @@
 {
   "domain": "contrymod_ac",
-  "name": "ContryMod RV Air Conditioner",
+  "name": "CountryMod RV Air Conditioner",
   "bluetooth": [
     {
       "connectable": true,
@@ -9,11 +9,15 @@
   ],
   "codeowners": [],
   "config_flow": true,
-  "dependencies": ["bluetooth_adapters"],
+  "dependencies": [
+    "bluetooth_adapters"
+  ],
   "documentation": "https://github.com/cjacob/ContryModHA",
   "integration_type": "device",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/cjacob/ContryModHA/issues",
-  "requirements": ["bleak-retry-connector>=3.5.0"],
+  "requirements": [
+    "bleak-retry-connector>=3.5.0"
+  ],
   "version": "0.1.0"
 }

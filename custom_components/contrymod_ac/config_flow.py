@@ -24,6 +24,7 @@ from .const import (
     CONF_SCAN_INTERVAL,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
+    GAP_NAME,
     MAX_SCAN_INTERVAL,
     MIN_SCAN_INTERVAL,
     NAME_PREFIX,
@@ -33,14 +34,17 @@ from .protocol import DEFAULT_KIND_CODE
 
 
 def _is_supported(info: BluetoothServiceInfoBleak) -> bool:
-    """Return True for advertisements that look like a ContryMod controller.
+    """Return True for advertisements that look like a CountryMod controller.
 
     FFE0 alone is a generic serial-bridge UUID used by many unrelated devices,
-    so the advertised name prefix is what actually identifies the model.
+    so the name is what actually identifies the model. Two names are valid: the
+    advertised "KT<serial>", and the module's GAP name, which replaces the
+    serial in the host's cache as soon as anything connects to it.
     """
     if SERVICE_UUID not in {uuid.lower() for uuid in info.service_uuids}:
         return False
-    return bool(info.name) and info.name.upper().startswith(NAME_PREFIX)
+    name = (info.name or "").upper()
+    return name.startswith(NAME_PREFIX) or name == GAP_NAME
 
 
 class ContryModConfigFlow(ConfigFlow, domain=DOMAIN):
