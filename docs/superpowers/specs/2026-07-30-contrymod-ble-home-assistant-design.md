@@ -9,8 +9,8 @@ recirculation.
 
 ## Known device facts
 
-- Controller observed by the RV Home Assistant host: `KT2026020005224`
-  (`CA:04:59:8E:32:D5`).
+- Controller observed by the RV Home Assistant host: `KT2000000000000`
+  (`AA:BB:CC:DD:EE:FF`).
 - It is a nearby, unpaired Bluetooth Low Energy peripheral.
 - The official app is AeroLink Core. Its Android package is
   `com.kingcontech.btac`.

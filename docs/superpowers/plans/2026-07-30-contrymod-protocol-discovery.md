@@ -135,21 +135,21 @@ Expected: a clean status; the APK and JADX tree remain ignored.
 Run from the development workstation:
 
 ```bash
-ssh va 'bluetoothctl info CA:04:59:8E:32:D5'
+ssh va 'bluetoothctl info AA:BB:CC:DD:EE:FF'
 ```
 
-Expected: `Name: KT2026020005224`, a public address, and no pairing/bonding. Copy the name, address type, RSSI, advertising flags, and observed connection state into the census. Do not run `pair`, `trust`, or `remove`.
+Expected: `Name: KT2000000000000`, a public address, and no pairing/bonding. Copy the name, address type, RSSI, advertising flags, and observed connection state into the census. Do not run `pair`, `trust`, or `remove`.
 
 - [ ] **Step 2: Connect temporarily and enumerate services/characteristics without writing**
 
 On the RV host, use an interactive `bluetoothctl` session:
 
 ```text
-connect CA:04:59:8E:32:D5
+connect AA:BB:CC:DD:EE:FF
 menu gatt
 list-attributes
 back
-disconnect CA:04:59:8E:32:D5
+disconnect AA:BB:CC:DD:EE:FF
 quit
 ```
 

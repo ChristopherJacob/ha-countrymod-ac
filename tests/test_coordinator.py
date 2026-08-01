@@ -20,7 +20,7 @@ from custom_components.contrymod_ac.const import DOMAIN
 from custom_components.contrymod_ac.coordinator import ContryModCoordinator
 from custom_components.contrymod_ac.protocol import Command, build_command
 
-ADDRESS = "CA:04:59:8E:32:D5"
+ADDRESS = "AA:BB:CC:DD:EE:FF"
 
 
 def build_state_frame(target: int = 75, fan: int = 3, power: bool = True) -> bytes:
@@ -107,7 +107,7 @@ def fake_client() -> FakeClient:
 @pytest.fixture
 def coordinator(hass: HomeAssistant, fake_client: FakeClient):
     """A coordinator wired to the fake client."""
-    entry = MockConfigEntry(domain=DOMAIN, title="KT2026020005224")
+    entry = MockConfigEntry(domain=DOMAIN, title="KT2000000000000")
     entry.add_to_hass(hass)
     coordinator = ContryModCoordinator(
         hass, entry, address=ADDRESS, kind_code=1, scan_interval=15

@@ -38,7 +38,7 @@ notification under **Settings → Devices & services**, or add it manually with
 **Add integration → CountryMod RV Air Conditioner**.
 
 Controllers advertise as `KT` followed by a serial number, e.g.
-`KT2026020005224`, and advertise no service UUIDs — so discovery matches on the
+`KT2000000000000`, and advertise no service UUIDs — so discovery matches on the
 name.
 
 Once anything connects to a controller, the host caches the module's GAP name

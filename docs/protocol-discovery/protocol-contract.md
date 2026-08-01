@@ -9,7 +9,7 @@ statically recovered from the AeroLink Core app (see
 
 | Property | Value |
 | --- | --- |
-| Advertised name | `KT` + serial, e.g. `KT2026020005224` |
+| Advertised name | `KT` + serial, e.g. `KT2000000000000` |
 | GAP device name (after connect) | `LS Dis Server` |
 | Address type | public |
 | Advertised service UUIDs | **none** — the advertisement carries only flags (`06`) and the local name |

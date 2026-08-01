@@ -13,7 +13,7 @@ from homeassistant.data_entry_flow import FlowResultType
 from custom_components.contrymod_ac.config_flow import _is_supported
 from custom_components.contrymod_ac.const import DOMAIN
 
-ADDRESS = "CA:04:59:8E:32:D5"
+ADDRESS = "AA:BB:CC:DD:EE:FF"
 
 
 def service_info(name: str, uuids=(), address=ADDRESS):
@@ -40,7 +40,7 @@ def service_info(name: str, uuids=(), address=ADDRESS):
 
 class TestDiscoveryMatching:
     def test_accepts_advertised_serial(self):
-        assert _is_supported(service_info("KT2026020005224"))
+        assert _is_supported(service_info("KT2000000000000"))
 
     def test_accepts_the_gap_name(self):
         """Once anything connects, the host caches the module's GAP name.
@@ -66,7 +66,7 @@ class TestDiscoveryMatching:
         FFE0 exists only in the GATT table, so requiring it in the
         advertisement rejects every real controller.
         """
-        assert _is_supported(service_info("KT2026020005224", uuids=()))
+        assert _is_supported(service_info("KT2000000000000", uuids=()))
 
 
 class TestBluetoothFlow:
@@ -157,8 +157,8 @@ class TestManifestMatcher:
             index.add(dict(matcher, domain=DOMAIN))
         index.build()
 
-        # Verbatim advertisement captured from the controller: local name only.
-        assert index.match(service_info("KT2026020005224"))
+        # Shaped like the captured advertisement: local name, no service UUIDs.
+        assert index.match(service_info("KT2000000000000"))
 
     async def test_matcher_ignores_unrelated_devices(self, hass):
         from homeassistant.components.bluetooth.match import BluetoothMatcherIndexBase
