@@ -11,13 +11,17 @@ from homeassistant.const import CONF_ADDRESS
 from homeassistant.data_entry_flow import FlowResultType
 
 from custom_components.contrymod_ac.config_flow import _is_supported
-from custom_components.contrymod_ac.const import DOMAIN, SERVICE_UUID
+from custom_components.contrymod_ac.const import DOMAIN
 
 ADDRESS = "CA:04:59:8E:32:D5"
 
 
-def service_info(name: str, uuids=(SERVICE_UUID,), address=ADDRESS):
-    """Build a discovery record the way Home Assistant would present one."""
+def service_info(name: str, uuids=(), address=ADDRESS):
+    """Build a discovery record the way Home Assistant would present one.
+
+    The controller advertises no service UUIDs at all, so the default here is
+    an empty list -- matching what the radio actually sends.
+    """
     return BluetoothServiceInfoBleak(
         name=name,
         address=address,
@@ -50,15 +54,19 @@ class TestDiscoveryMatching:
         assert _is_supported(service_info("ls dis server"))
         assert _is_supported(service_info("kt2026020005224"))
 
-    def test_rejects_other_devices_sharing_the_ffe0_uuid(self):
-        """FFE0 is a generic serial-bridge UUID used by unrelated hardware."""
+    def test_rejects_unrelated_devices(self):
         assert not _is_supported(service_info("Some Other Gadget"))
-
-    def test_rejects_when_service_uuid_is_absent(self):
-        assert not _is_supported(service_info("KT2026020005224", uuids=()))
 
     def test_rejects_missing_name(self):
         assert not _is_supported(service_info(""))
+
+    def test_does_not_require_an_advertised_service_uuid(self):
+        """The controller advertises only flags and its name.
+
+        FFE0 exists only in the GATT table, so requiring it in the
+        advertisement rejects every real controller.
+        """
+        assert _is_supported(service_info("KT2026020005224", uuids=()))
 
 
 class TestBluetoothFlow:
@@ -77,7 +85,7 @@ class TestBluetoothFlow:
         assert result["type"] is FlowResultType.CREATE_ENTRY
         assert result["data"][CONF_ADDRESS] == ADDRESS
 
-    async def test_unrelated_ffe0_device_is_rejected(self, hass):
+    async def test_unrelated_device_is_rejected(self, hass):
         result = await hass.config_entries.flow.async_init(
             DOMAIN,
             context={"source": SOURCE_BLUETOOTH},
@@ -92,9 +100,7 @@ class TestBluetoothFlow:
             context={"source": SOURCE_BLUETOOTH},
             data=service_info("LS Dis Server"),
         )
-        await hass.config_entries.flow.async_configure(
-            first["flow_id"], user_input={}
-        )
+        await hass.config_entries.flow.async_configure(first["flow_id"], user_input={})
         second = await hass.config_entries.flow.async_init(
             DOMAIN,
             context={"source": SOURCE_BLUETOOTH},
@@ -107,8 +113,7 @@ class TestBluetoothFlow:
 class TestManualFlow:
     async def test_lists_controllers_in_range(self, hass):
         with patch(
-            "custom_components.contrymod_ac.config_flow"
-            ".async_discovered_service_info",
+            "custom_components.contrymod_ac.config_flow.async_discovered_service_info",
             return_value=[service_info("LS Dis Server")],
         ):
             result = await hass.config_entries.flow.async_init(
@@ -125,12 +130,11 @@ class TestManualFlow:
     @pytest.mark.parametrize(
         "discovered",
         [[], [service_info("Some Other Gadget")]],
-        ids=["nothing_in_range", "only_unrelated_ffe0"],
+        ids=["nothing_in_range", "only_unrelated_devices"],
     )
     async def test_aborts_when_nothing_matches(self, hass, discovered):
         with patch(
-            "custom_components.contrymod_ac.config_flow"
-            ".async_discovered_service_info",
+            "custom_components.contrymod_ac.config_flow.async_discovered_service_info",
             return_value=discovered,
         ):
             result = await hass.config_entries.flow.async_init(
@@ -138,3 +142,32 @@ class TestManualFlow:
             )
         assert result["type"] is FlowResultType.ABORT
         assert result["reason"] == "no_devices_found"
+
+
+class TestManifestMatcher:
+    """The manifest matcher is what triggers automatic discovery."""
+
+    async def test_matcher_matches_the_real_advertisement(self, hass):
+        from homeassistant.components.bluetooth.match import BluetoothMatcherIndexBase
+        from homeassistant.loader import async_get_integration
+
+        integration = await async_get_integration(hass, DOMAIN)
+        index = BluetoothMatcherIndexBase()
+        for matcher in integration.bluetooth:
+            index.add(dict(matcher, domain=DOMAIN))
+        index.build()
+
+        # Verbatim advertisement captured from the controller: local name only.
+        assert index.match(service_info("KT2026020005224"))
+
+    async def test_matcher_ignores_unrelated_devices(self, hass):
+        from homeassistant.components.bluetooth.match import BluetoothMatcherIndexBase
+        from homeassistant.loader import async_get_integration
+
+        integration = await async_get_integration(hass, DOMAIN)
+        index = BluetoothMatcherIndexBase()
+        for matcher in integration.bluetooth:
+            index.add(dict(matcher, domain=DOMAIN))
+        index.build()
+
+        assert not index.match(service_info("Some Other Gadget"))

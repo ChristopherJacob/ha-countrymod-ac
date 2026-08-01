@@ -12,13 +12,24 @@ statically recovered from the AeroLink Core app (see
 | Advertised name | `KT` + serial, e.g. `KT2026020005224` |
 | GAP device name (after connect) | `LS Dis Server` |
 | Address type | public |
-| Advertised service UUID | `0000FFE0-0000-1000-8000-00805F9B34FB` |
+| Advertised service UUIDs | **none** — the advertisement carries only flags (`06`) and the local name |
 | Pairing / bonding | Not required, not used |
 | Encryption / authentication | None present in the app or on the wire |
 
-Discovery should match the advertised `FFE0` service UUID and then require the
-advertised local name to start with `KT`. `FFE0` alone is a generic
-serial-bridge UUID shared by many unrelated devices.
+Discovery must match on the **local name**, not on a service UUID. The
+controller advertises no service UUIDs at all: `FFE0` appears only after
+connecting and resolving GATT, and a host that has already done so reports
+`FFE0`, `1800` and `1801` together from its service cache — which is easy to
+mistake for advertised data.
+
+Two names must both be accepted. The advertisement carries `KT<serial>`, but
+reading the module's GAP device name replaces the serial in the host's cache,
+so a controller that the phone app has ever connected to is seen as
+`LS Dis Server` instead. Clearing the host's device record restores the
+advertised serial.
+
+Home Assistant's matcher index additionally requires at least three literal
+characters, so `KT*` is rejected and `KT2*` is the usable form.
 
 ## GATT
 

@@ -36,8 +36,18 @@ notification under **Settings → Devices & services**, or add it manually with
 **Add integration → CountryMod RV Air Conditioner**.
 
 Controllers advertise as `KT` followed by a serial number, e.g.
-`KT2026020005224`. Once anything has connected to one, the host caches the
-module's GAP name (`LS Dis Server`) instead, so discovery accepts both.
+`KT2026020005224`, and advertise no service UUIDs — so discovery matches on the
+name.
+
+Once anything connects to a controller, the host caches the module's GAP name
+(`LS Dis Server`) in place of the serial. Discovery accepts both names, but
+automatic discovery only fires on the serial. If your controller has been used
+with the AeroLink Core app and does not turn up on its own, add it manually, or
+clear the stale name first:
+
+```bash
+bluetoothctl remove AA:BB:CC:DD:EE:FF
+```
 
 ## Entities
 
