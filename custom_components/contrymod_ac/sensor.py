@@ -15,6 +15,7 @@ from homeassistant.const import (
     EntityCategory,
     UnitOfElectricPotential,
     UnitOfTemperature,
+    UnitOfTime,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -85,6 +86,8 @@ SENSORS: tuple[ContryModSensorDescription, ...] = (
     ContryModSensorDescription(
         key="remaining_open_time",
         translation_key="remaining_open_time",
+        device_class=SensorDeviceClass.DURATION,
+        native_unit_of_measurement=UnitOfTime.MINUTES,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         value_fn=lambda state: state.remaining_open_time,
@@ -92,6 +95,8 @@ SENSORS: tuple[ContryModSensorDescription, ...] = (
     ContryModSensorDescription(
         key="remaining_close_time",
         translation_key="remaining_close_time",
+        device_class=SensorDeviceClass.DURATION,
+        native_unit_of_measurement=UnitOfTime.MINUTES,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         value_fn=lambda state: state.remaining_close_time,

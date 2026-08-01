@@ -35,6 +35,9 @@
     },
     "invalid_fan_mode": {
       "message": "{mode} is not a valid fan speed. Use 1 through 6."
+    },
+    "mode_not_accepted": {
+      "message": "The air conditioner did not switch to {mode}. This unit may not support that mode."
     }
   },
   "entity": {
@@ -54,20 +57,43 @@
       }
     },
     "binary_sensor": {
-      "problem": { "name": "Fault" }
+      "problem": {
+        "name": "Fault"
+      }
     },
     "sensor": {
-      "inlet_temperature": { "name": "Inlet temperature" },
-      "core_temperature": { "name": "Coil temperature" },
-      "voltage": { "name": "Supply voltage" },
-      "fault_code": { "name": "Fault code" },
-      "compressor_current": { "name": "Compressor current (raw)" },
-      "fan_current": { "name": "Fan current (raw)" },
-      "remaining_open_time": { "name": "Timer remaining until on" },
-      "remaining_close_time": { "name": "Timer remaining until off" }
+      "inlet_temperature": {
+        "name": "Inlet temperature"
+      },
+      "core_temperature": {
+        "name": "Coil temperature"
+      },
+      "voltage": {
+        "name": "Supply voltage"
+      },
+      "fault_code": {
+        "name": "Fault code"
+      },
+      "compressor_current": {
+        "name": "Compressor current (raw)"
+      },
+      "fan_current": {
+        "name": "Fan current (raw)"
+      },
+      "remaining_open_time": {
+        "name": "Timer remaining until on"
+      },
+      "remaining_close_time": {
+        "name": "Timer remaining until off"
+      }
     },
     "switch": {
-      "screen_display": { "name": "Panel display" }
+      "screen_display": {
+        "name": "Panel display"
+      },
+      "light": {
+        "name": "Light"
+      }
     },
     "select": {
       "wind_side": {
@@ -79,7 +105,9 @@
       }
     },
     "number": {
-      "under_voltage": { "name": "Low voltage cut-off" }
+      "under_voltage": {
+        "name": "Low voltage cut-off"
+      }
     }
   }
 }

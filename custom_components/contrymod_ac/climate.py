@@ -11,7 +11,7 @@ from homeassistant.components.climate import (
 )
 from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import ContryModConfigEntry
@@ -46,6 +46,15 @@ HVAC_TO_COMMAND: dict[HVACMode, ModeCommand] = {
     HVACMode.DRY: ModeCommand.DRY,
     HVACMode.FAN_ONLY: ModeCommand.FAN,
     HVACMode.HEAT: ModeCommand.HEAT,
+}
+
+#: Home Assistant mode -> the base mode the controller should then report.
+#: Used to tell "the unit adopted the mode" from "the unit ignored it".
+HVAC_TO_STATE: dict[HVACMode, ModeState] = {
+    HVACMode.COOL: ModeState.COOL,
+    HVACMode.DRY: ModeState.DRY,
+    HVACMode.FAN_ONLY: ModeState.FAN,
+    HVACMode.HEAT: ModeState.HEAT,
 }
 
 PRESET_NONE = "none"
@@ -151,8 +160,12 @@ class ContryModClimate(ContryModEntity, ClimateEntity):
             return HVACMode.OFF
         mode_state = state.mode_state
         if mode_state is None:
-            return None
-        return STATE_TO_HVAC.get(mode_state)
+            # While ECO is engaged the controller reports base mode 0, which is
+            # not one of its own mode values. ECO is a cooling-family preset,
+            # so report COOL rather than dropping the entity to an unknown
+            # mode every time ECO is selected.
+            return HVACMode.COOL
+        return STATE_TO_HVAC[mode_state]
 
     @property
     def fan_mode(self) -> str | None:
@@ -221,7 +234,18 @@ class ContryModClimate(ContryModEntity, ClimateEntity):
         state = self.state_data
         if state is not None and not state.power:
             await self.coordinator.async_send_command(Command.POWER, Power.ON)
-        await self.coordinator.async_send_command(Command.WORK_MODE, command)
+
+        state = await self.coordinator.async_send_command(Command.WORK_MODE, command)
+
+        # Not every unit implements every mode -- a cooling-only model silently
+        # ignores HEAT. Surface that instead of leaving the user with a control
+        # that appears to do nothing.
+        if state.power and state.mode != HVAC_TO_STATE[hvac_mode]:
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="mode_not_accepted",
+                translation_placeholders={"mode": str(hvac_mode)},
+            )
 
     async def async_turn_on(self) -> None:
         await self.coordinator.async_send_command(Command.POWER, Power.ON)

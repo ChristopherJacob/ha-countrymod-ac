@@ -9,11 +9,10 @@ board over BLE.
 
 ## Status
 
-The wire protocol was recovered by decompiling the vendor app and then
-validated against a physical unit. Setpoint, fan speed, mode switching, and
-state decoding are confirmed on real hardware; the rest is implemented from the
-app's own code but has not been exercised on a unit. See
-[Validation status](#validation-status) before trusting a control in an
+The wire protocol was recovered by decompiling the vendor app and then validated
+against a physical unit. Every control this integration exposes has been
+confirmed on real hardware except **power on/off** and **HEAT** — see
+[Validation status](#validation-status) before trusting those two in an
 automation.
 
 ## Requirements
@@ -49,10 +48,11 @@ Controllers advertise as `KT` followed by a serial number, e.g.
 | Supply voltage | `sensor` | Battery voltage seen by the controller |
 | Fault / Fault code | `binary_sensor`, `sensor` | Non-zero fault code raises the problem flag |
 | Panel display | `switch` | The controller's own screen |
+| Light | `switch` | Ambient light; the controller exposes only on/off state |
 | Air intake | `select` | Recirculate or fresh air |
 | Low voltage cut-off | `number` | Battery protection setpoint |
 | Compressor / fan current | `sensor` | Disabled by default; scaling unconfirmed |
-| Timer remaining | `sensor` | Disabled by default |
+| Timer remaining | `sensor` | Minutes; disabled by default |
 
 The climate entity reports temperatures in whichever unit the controller itself
 is set to, and its allowed range follows suit (16–30 °C or 61–86 °F).
@@ -76,27 +76,40 @@ Full details, including the byte layout and the evidence for each field, are in
 
 ## Validation status
 
-Confirmed against the physical unit, each verified by a state frame and then
-restored to its original value:
+Confirmed against the physical unit, each verified by a returned state frame and
+then restored to its original value:
 
 - state refresh and full state decoding
-- target temperature
-- fan speed
-- work mode COOL and FAN
+- target temperature, fan speed
+- work modes COOL, FAN and DRY
+- presets ECO, SLEEP, TURBO and AUTO
+- swing, panel display, light, air intake
+- low voltage cut-off, temperature unit, timer enable / value / disable
 
-Implemented from the vendor app but **not** exercised on hardware: power on/off,
-HEAT / DRY / TURBO / ECO / SLEEP / AUTO, swing, panel display, air intake, low
-voltage cut-off, and the timer. These are built from the same frame format that
-was validated, so they are likely correct, but nobody has watched the unit obey
-them.
+**Not** yet exercised on hardware:
 
-One trap worth knowing about: the command and state mode enums are **not** the
-same. Commanding FAN uses value `2`, and the controller then reports mode `3`.
-The integration handles this; anything else talking to the unit needs to.
+- **Power on/off.** The frame is the same shape as everything above, but
+  cycling a compressor unattended risks short-cycling it, so this was left for
+  a supervised run.
+- **HEAT.** The test unit ignored the mode command completely — it appears to
+  be a cooling-only model. Other ContryMod units may accept it. The integration
+  raises an error rather than silently doing nothing when the unit declines a
+  mode.
+- **Negative ion.** The state flag decodes, but the vendor app has no command
+  code for it, so there is nothing to send.
 
-Also unconfirmed: the scaling of the compressor and fan current fields (both
-read zero in every capture), and whether the coil temperature really is
-Celsius.
+Three traps worth knowing about if you talk to one of these units yourself:
+
+- The command and state mode enums are **not** the same. Commanding FAN uses
+  value `2`, and the controller then reports mode `3`.
+- **ECO clears the base mode field** to `0`, which is not one of the
+  controller's own mode values.
+- **Changing the temperature unit re-scales the setpoint** on the controller
+  itself — 75 °F becomes 23 °C. Do not convert locally.
+
+Still unconfirmed: the scaling of the compressor and fan current fields (both
+read zero in every capture, including while actively cooling), and whether the
+coil temperature really is Celsius.
 
 ## A note on the phone app
 

@@ -19,8 +19,13 @@ async def async_setup_entry(
     entry: ContryModConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up the panel display switch."""
-    async_add_entities([ContryModScreenDisplay(entry.runtime_data)])
+    """Set up the panel display and light switches."""
+    async_add_entities(
+        [
+            ContryModScreenDisplay(entry.runtime_data),
+            ContryModLight(entry.runtime_data),
+        ]
+    )
 
 
 class ContryModScreenDisplay(ContryModEntity, SwitchEntity):
@@ -43,3 +48,30 @@ class ContryModScreenDisplay(ContryModEntity, SwitchEntity):
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         await self.coordinator.async_send_command(Command.SCREEN_DISPLAY, 1)
+
+
+class ContryModLight(ContryModEntity, SwitchEntity):
+    """The controller's ambient light.
+
+    The vendor app cycles this through three values, but the controller only
+    reports one bit, and value 2 reads back as off -- so it is modelled as a
+    plain switch.
+    """
+
+    _attr_entity_category = EntityCategory.CONFIG
+    _attr_translation_key = "light"
+
+    def __init__(self, coordinator) -> None:
+        super().__init__(coordinator)
+        self._attr_unique_id = f"{coordinator.address}_light"
+
+    @property
+    def is_on(self) -> bool | None:
+        state = self.state_data
+        return None if state is None else state.light
+
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        await self.coordinator.async_send_command(Command.LIGHT, 1)
+
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        await self.coordinator.async_send_command(Command.LIGHT, 0)

@@ -72,17 +72,17 @@ app's own 3-second refresh poll and is the preferred way to request state.
 | --- | --- | --- | --- |
 | State refresh | `0xFF` | `0` | **validated** |
 | Power | `1` | `1` = off, `2` = on | static only |
-| Work mode | `2` | COOL=1, FAN=2, ECO=4, SLEEP=5, TURBO=6, DRY=7, HEAT=8, AUTO=9 | COOL and FAN **validated**; others static only |
+| Work mode | `2` | COOL=1, FAN=2, ECO=4, SLEEP=5, TURBO=6, DRY=7, HEAT=8, AUTO=9 | COOL, FAN, DRY, ECO, SLEEP, TURBO, AUTO **validated**; HEAT declined by the test unit |
 | Target temperature | `3` | 16–30 (°C) or 61–86 (°F), sent as the displayed integer | **validated** (°F) |
 | Fan speed | `4` | 1–6 | **validated** |
-| Under-voltage setpoint | `5` | `10 × volts` | static only |
-| Screen display | `10` (`0x0A`) | `1` = off, `2` = on | static only |
-| Timer enable | `22` (`0x16`) | `2` = enable, `3` = disable | static only |
-| Timer value | `24` (`0x18`) | `(hours & 0x0F) << 4 | (minute_index & 0x0F)` | static only |
-| Light | `28` (`0x1C`) | `0`, `1`, `2` | static only |
-| Temperature unit | `32` (`0x20`) | `1` = Celsius, `2` = Fahrenheit | static only |
-| Wind side | `68` (`0x44`) | `0` = inner, `1` = outer | static only |
-| Swing | `69` (`0x45`) | `0` = off, `1` = on | static only |
+| Under-voltage setpoint | `5` | `10 × volts` | **validated** |
+| Screen display | `10` (`0x0A`) | `1` = off, `2` = on | **validated** |
+| Timer enable | `22` (`0x16`) | `2` = enable, `3` = disable | **validated** |
+| Timer value | `24` (`0x18`) | `(hours & 0x0F) << 4 | (minute_index & 0x0F)` | **validated** |
+| Light | `28` (`0x1C`) | `1` = on; `0` and `2` both read back as off | **validated** |
+| Temperature unit | `32` (`0x20`) | `1` = Celsius, `2` = Fahrenheit | **validated** |
+| Wind side | `68` (`0x44`) | `0` = inner, `1` = outer | **validated** |
+| Swing | `69` (`0x45`) | `0` = off, `1` = on | **validated** |
 
 The app pauses its poll loop, waits ~300 ms, sends one command, then resumes
 polling. The integration follows the same pattern.
@@ -118,8 +118,8 @@ Validation, in order: length ≥ 19; `byte[0] == byte[1] == 0x5A`; last two byte
 | 9 | `under_voltage` (decivolts: `90` = 9.0 V) |
 | 10 | `fault_code` (`0` = healthy) |
 | 11 | `setting_timer` (non-zero → enabled) |
-| 12–13 | `remaining_open_time` (big-endian) |
-| 14–15 | `remaining_close_time` (big-endian) |
+| 12–13 | `remaining_open_time` (big-endian, **minutes**) |
+| 14–15 | `remaining_close_time` (big-endian, **minutes**) |
 | 16 bit 0 | `temperature_unit` — `0` = Celsius, `1` = Fahrenheit |
 | 17 | `target_temperature` (in the reported unit) |
 | 18 | checksum |
@@ -137,11 +137,32 @@ This is the single most important implementation detail. The value used to
 | FAN | 2 | 3 |
 | HEAT | 8 | 4 |
 
-COOL and FAN were confirmed physically; DRY and HEAT come from the app's enums.
+COOL, FAN and DRY were confirmed physically. HEAT comes from the app's enum:
+the test unit is cooling-only and ignored the mode entirely.
 
 TURBO, ECO, SLEEP and AUTO are *commanded* through the same `CODE=2` but are
 *reported* as independent flag bits in byte 3, layered on top of the base mode.
 They are modifiers, not base modes.
+
+Two behaviours a client has to absorb:
+
+- **ECO clears the base mode field.** While ECO is engaged, `byte[2]` bits 6–4
+  read `0`, which is not a valid `Vt` value. SLEEP, TURBO and AUTO leave the
+  base mode intact.
+- **Some mode changes move the fan.** DRY forced fan speed to 1 and TURBO
+  raised it to 5, so fan speed must be re-read after a mode change rather than
+  assumed unchanged.
+
+Not every unit implements every mode. A client should confirm a base-mode
+command by checking that the controller then reports the matching `Vt` value,
+and treat an unchanged mode as a rejection rather than a success.
+
+## Unit changes
+
+Writing `CODE=32` makes the controller convert its own setpoint: 75 °F became
+23 °C and switching back restored 75 °F. `inlet_temperature` and
+`target_temperature` both follow `temperature_unit`. A client should re-read
+state after a unit change rather than converting locally.
 
 ## Failure semantics
 
