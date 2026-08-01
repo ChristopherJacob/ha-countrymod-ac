@@ -1,0 +1,22 @@
+# Test dependencies.
+#
+# pytest-homeassistant-custom-component brings Home Assistant itself, but not
+# the requirements of the components this integration depends on. Importing
+# custom_components.countrymod_ac imports homeassistant.components.bluetooth,
+# which needs the Bluetooth stack below or collection fails with
+# ModuleNotFoundError before a single test runs.
+pytest-homeassistant-custom-component
+ruff
+pillow
+
+# Home Assistant's Bluetooth stack.
+aioesphomeapi
+aiousbwatcher
+bleak
+bleak-retry-connector
+bluetooth-adapters
+bluetooth-auto-recovery
+bluetooth-data-tools
+dbus-fast
+habluetooth
+serialx

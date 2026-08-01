@@ -139,9 +139,9 @@ Remove or disable the integration if you need the app back.
 
 ```bash
 python3 -m venv .venv
-.venv/bin/pip install homeassistant pytest-homeassistant-custom-component ruff
+.venv/bin/pip install -r requirements-test.txt
 .venv/bin/python -m pytest
-.venv/bin/ruff check custom_components tests
+.venv/bin/ruff check custom_components tests tools
 ```
 
 The codec in `custom_components/countrymod_ac/protocol.py` has no Home Assistant
