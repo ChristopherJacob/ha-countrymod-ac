@@ -37,13 +37,17 @@ images, and they take priority over the CDN. The copies in
 `custom_components/countrymod_ac/brand/` are what the UI actually uses — no
 pull request and no CDN wait.
 
-For anyone on an older release, the same files are also submitted to
-[home-assistant/brands](https://github.com/home-assistant/brands) under
-`custom_integrations/countrymod_ac/`, which serves them from
-`brands.home-assistant.io`.
+**The brands repository is not an option for this integration.** Its pull
+request template states that "pull requests for adding new custom components
+will no longer be accepted", its README marks `custom_integrations/` as a legacy
+folder, and every recent custom-integration pull request there has been closed
+unmerged. The `brand/` folder is the supported route.
 
-Keep the two copies in sync: `tools/make_brand_assets.py` writes `assets/brands/`
-and they are copied into the integration.
+The practical consequence: on Home Assistant older than 2026.3 this integration
+shows a placeholder icon, and there is no way to fix that. Upgrading is the fix.
+
+`assets/brands/` holds the generated masters; they are copied into
+`custom_components/countrymod_ac/brand/`. Keep the two in sync.
 
 ## Provenance
 

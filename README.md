@@ -33,6 +33,9 @@ directory:
 <config>/custom_components/countrymod_ac/
 ```
 
+The integration carries its own icon in `brand/`, which Home Assistant 2026.3
+and later use automatically. Older releases show a placeholder instead.
+
 Restart Home Assistant. The controller is discovered automatically — look for a
 notification under **Settings → Devices & services**, or add it manually with
 **Add integration → CountryMod RV Air Conditioner**.
