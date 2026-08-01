@@ -85,9 +85,7 @@ def by_short_side(img, short):
     leaves the long side to follow the brand's own aspect ratio.
     """
     f = short / min(img.width, img.height)
-    return img.resize(
-        (round(img.width * f), round(img.height * f)), Image.LANCZOS
-    )
+    return img.resize((round(img.width * f), round(img.height * f)), Image.LANCZOS)
 
 
 def save(img, path):

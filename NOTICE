@@ -1,0 +1,10 @@
+The MIT licence in LICENSE covers the source code in this repository.
+
+It does not cover the CountryMod name or logo, which are trademarks of
+CountryMod. The brand images under assets/ and
+custom_components/countrymod_ac/brand/ are reproduced only to identify the
+device this integration controls, which is the convention Home Assistant itself
+uses for supported manufacturers. This project is not affiliated with,
+endorsed by, or sponsored by CountryMod or Kingcontech.
+
+See assets/README.md for provenance and for how to remove them.

@@ -153,5 +153,6 @@ real controller.
 Protocol recovered by static analysis of AeroLink Core 1.0.0 and validated
 against a physical unit. Not affiliated with CountryMod or Kingcontech.
 
-The CountryMod name and logo are the property of CountryMod and are used only to
-identify the supported device. See [`assets/README.md`](assets/README.md).
+Licensed MIT; see [`LICENSE`](LICENSE). The CountryMod name and logo are
+trademarks of CountryMod and are not covered by that licence — see
+[`NOTICE`](NOTICE).
