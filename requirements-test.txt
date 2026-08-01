@@ -20,3 +20,9 @@ bluetooth-data-tools
 dbus-fast
 habluetooth
 serialx
+
+# Linux-only transitive needs of the Bluetooth/USB stack. They are not reached
+# on macOS, so a local run there will pass without them while CI fails. serialx
+# provides a `serialx` module, not `serial`; pyserial is what supplies that.
+pyserial
+pyudev
